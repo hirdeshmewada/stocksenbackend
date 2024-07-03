@@ -1,4 +1,4 @@
-const Product = require("../models/Product");
+const Product = require("../models/Product").default;
 
 const purchaseStock = async (req, res) => {
   // Check if LLM mode is enabled
@@ -46,7 +46,5 @@ const purchaseStock = async (req, res) => {
     res.status(500).send(`Error updating purchase stock: ${error.message}`); // Send error message in normal mode
   }
 };
-
-
 
 module.exports = purchaseStock;

@@ -1,7 +1,7 @@
 const Sales = require("../models/sales");
 const soldStock = require("../controller/soldStock");
 const Store = require("../models/store");
-const Product = require("../models/Product");
+const Product = require("../models/Product").default;
 const { default: mongoose } = require("mongoose");
 
 const getMonthlySales = async (req, res) => {
@@ -133,7 +133,7 @@ const addSales = async (req, res) => {
       // myProductData.stock -= stockSold;
       // await myProductData.save({ session });
       let totalSaleAmount = myProductData.price * parseInt(stockSold);
-      console.log("totalSaleAmount", totalSaleAmount,stockSold,);
+      console.log("totalSaleAmount", totalSaleAmount, stockSold);
       // Create a regular expression to match any substring of the storeName
       const regex = new RegExp(storeName.split(" ").join("|"), "i");
 

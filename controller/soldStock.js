@@ -1,6 +1,5 @@
 const Sales = require("../models/sales");
-const Product = require("../models/Product");
-
+const Product = require("../models/Product").default;
 
 const soldStock = async (productID, stockSoldData, req = null) => {
   // If req.LLM is provided and true, handle LLM mode
@@ -44,12 +43,9 @@ const soldStock = async (productID, stockSoldData, req = null) => {
       { new: true }
     );
     console.log(SoldStock);
-
   } catch (error) {
     console.error("Error updating sold stock: ", error);
   }
 };
-
-
 
 module.exports = soldStock;

@@ -1,16 +1,19 @@
-const Product = require("../models/Product");
+const Product = require("../models/Product").default;
 
 const updateMultipleInventories = async (inventoryUpdates) => {
   try {
-    
-    const updateResults = []; 
-    console.log(inventoryUpdates)
+    const updateResults = [];
+    console.log(inventoryUpdates);
     for (const [name, quantity] of Object.entries(inventoryUpdates)) {
       // console.log(name,quantity)
       const product = await Product.findOne({ name });
-      console.log(product)
+      console.log(product);
       if (!product) {
-        updateResults.push({ name, success: false, message: "Product not found" });
+        updateResults.push({
+          name,
+          success: false,
+          message: "Product not found",
+        });
         continue;
       }
 
@@ -18,7 +21,11 @@ const updateMultipleInventories = async (inventoryUpdates) => {
       product.lastModified = Date.now();
       await product.save();
 
-      updateResults.push({ name, success: true, newInventory: product.inventory });
+      updateResults.push({
+        name,
+        success: true,
+        newInventory: product.inventory,
+      });
     }
 
     return { success: true, results: updateResults };

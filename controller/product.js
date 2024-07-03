@@ -2,12 +2,13 @@ const Product = require("../models/Product");
 const Purchase = require("../models/purchase");
 const Sales = require("../models/sales");
 
+
 // Add Post
 const addProduct = async (req, res) => {
   try {
     // Check if LLM mode is enabled
-    console.log("is llm",req.LLM)
-    console.log(req.body)
+    console.log("is llm", req.LLM);
+    console.log(req.body);
     if (req.LLM === true) {
       if (!req?.body?.userId) {
         return "User ID is required"; // Return message if in LLM mode
@@ -47,11 +48,11 @@ const addProduct = async (req, res) => {
 const getProductByName = async (req, res) => {
   try {
     // Check if LLM mode is enabled
-    
+
     if (req.LLM === true) {
       const productName = req?.params?.name.toLowerCase();
       const product = await Product.findOne({ name: productName });
-      console.log(product)
+      console.log(product);
       if (!product) {
         return "Product not found"; // Return message if in LLM mode
       }
@@ -95,8 +96,10 @@ const getAllProducts = async (req, res) => {
 const deleteSelectedProduct = async (req, res) => {
   try {
     if (req.LLM === true) {
-      const deleteProduct = await Product.deleteOne({ name: req.body.name.toLowerCase() });
-      console.log("req.LLM",req.LLM,"deleteProduct",deleteProduct)
+      const deleteProduct = await Product.deleteOne({
+        name: req.body.name.toLowerCase(),
+      });
+      console.log("req.LLM", req.LLM, "deleteProduct", deleteProduct);
       // const deletePurchaseProduct = await Purchase.deleteOne({ ProductID: req?.params?.id });
       // const deleteSaleProduct = await Sales.deleteOne({ ProductID: req?.params?.id });
       return { deleteProduct }; // Return result if in LLM mode
@@ -104,8 +107,12 @@ const deleteSelectedProduct = async (req, res) => {
 
     // Normal mode
     const deleteProduct = await Product.deleteOne({ _id: req?.params?.id });
-    const deletePurchaseProduct = await Purchase.deleteOne({ ProductID: req?.params?.id });
-    const deleteSaleProduct = await Sales.deleteOne({ ProductID: req?.params?.id });
+    const deletePurchaseProduct = await Purchase.deleteOne({
+      ProductID: req?.params?.id,
+    });
+    const deleteSaleProduct = await Sales.deleteOne({
+      ProductID: req?.params?.id,
+    });
     res.json({ deleteProduct, deletePurchaseProduct, deleteSaleProduct });
   } catch (error) {
     console.error("Error deleting selected product: ", error);
@@ -116,15 +123,21 @@ const deleteSelectedProduct = async (req, res) => {
 const updateSelectedProduct = async (req, res) => {
   try {
     const updateFields = {};
-    const allowedFields = ['name', 'manufacturer', 'description', 'price', 'stock', ];
+    const allowedFields = [
+      "name",
+      "manufacturer",
+      "description",
+      "price",
+      "stock",
+    ];
 
     // Populate updateFields only with the fields present in req.body
-    allowedFields.forEach(field => {
+    allowedFields.forEach((field) => {
       if (req.body[field] !== undefined) {
         updateFields[field] = req.body[field];
       }
     });
-    console.log("updateFields", updateFields)
+    console.log("updateFields", updateFields);
 
     // Check if LLM mode is enabled
     if (req.LLM === true) {
@@ -150,22 +163,27 @@ const updateSelectedProduct = async (req, res) => {
   }
 };
 
-
 const searchProduct = async (req, res) => {
   try {
     if (req.LLM === true) {
       const searchTerm = req?.query?.searchTerm;
-      const products = await Product.find({
-        name: { $regex: searchTerm, $options: "i" },
-      }, 'name manufacturer price');
+      const products = await Product.find(
+        {
+          name: { $regex: searchTerm, $options: "i" },
+        },
+        "name manufacturer price"
+      );
       return products; // Return result if in LLM mode
     }
 
     // Normal mode
     const searchTerm = req?.query?.searchTerm;
-    const products = await Product.find({
-      name: { $regex: searchTerm, $options: "i" },
-    }, 'name manufacturer price');
+    const products = await Product.find(
+      {
+        name: { $regex: searchTerm, $options: "i" },
+      },
+      "name manufacturer price"
+    );
     res.json(products);
   } catch (error) {
     console.error("Error searching for products: ", error);
@@ -179,5 +197,5 @@ module.exports = {
   deleteSelectedProduct,
   updateSelectedProduct,
   searchProduct,
-  getProductByName
+  getProductByName,
 };

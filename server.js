@@ -4,11 +4,10 @@ const productRoute = require("./router/product");
 const storeRoute = require("./router/store");
 const purchaseRoute = require("./router/purchase");
 const salesRoute = require("./router/sales");
-const voice = require("./router/voice")
+const voice = require("./router/voice");
 const cors = require("cors");
 const User = require("./models/users");
-const Product = require("./models/Product");
-
+const Product = require("./models/Product").default;
 
 const app = express();
 const PORT = 4000;
@@ -28,7 +27,7 @@ app.use("/api/purchase", purchaseRoute);
 // Sales API
 app.use("/api/sales", salesRoute);
 
-app.use("/api/gemini", voice)
+app.use("/api/gemini", voice);
 
 // ------------- Signin --------------
 let userAuthCheck;
@@ -80,13 +79,10 @@ app.post("/api/register", (req, res) => {
   console.log("request: ", req.body);
 });
 
-
-
-app.get("/testget", async (req,res)=>{
-  const result = await Product.findOne({ _id: '6429979b2e5434138eda1564'})
-  res.json(result)
-
-})
+app.get("/testget", async (req, res) => {
+  const result = await Product.findOne({ _id: "6429979b2e5434138eda1564" });
+  res.json(result);
+});
 
 // Here we are listening to the server
 app.listen(PORT, () => {
