@@ -1,7 +1,7 @@
 const Sales = require("../models/sales");
 const soldStock = require("../controller/soldStock");
 const Store = require("../models/store");
-const Product = require("../models/Product").default;
+const Product = require("../models/product").default;
 const { default: mongoose } = require("mongoose");
 
 const getMonthlySales = async (req, res) => {
