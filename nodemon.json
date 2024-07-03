@@ -1,0 +1,9 @@
+{
+  "watch": ["."],
+  "ext": "js,json",
+  "ignore": [],
+  "exec": "node server.js",
+  "restartable": "rs",
+  "verbose": true,
+  "legacyWatch": true
+}
