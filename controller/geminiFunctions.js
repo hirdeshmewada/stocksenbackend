@@ -217,10 +217,10 @@ const functions = {
     
 
     
-    // addSales: async (req,res) => {
-    //   console.log("addSales");
-    //   return addSales(req,res);
-    // },
+    addSales: async (req,res) => {
+      console.log("addSales");
+      return addSales(req,res);
+    },
     
     // getSalesData: async (req,res) => {
     //   console.log("getSalesData");
@@ -268,10 +268,10 @@ const generativeModel = genAI.getGenerativeModel({
       getPurchaseDataFunctionDeclaration,
       getTotalPurchaseAmountFunctionDeclaration,
       purchaseStockFunctionDeclaration,
-      // addSalesFunctionDeclaration,
-      // getSalesDataFunctionDeclaration,
-      // getTotalSalesAmountFunctionDeclaration,
-      // soldStockFunctionDeclaration,
+      addSalesFunctionDeclaration,
+      getSalesDataFunctionDeclaration,
+      getTotalSalesAmountFunctionDeclaration,
+      soldStockFunctionDeclaration,
       // addStoreFunctionDeclaration,
       // getAllStoresFunctionDeclaration,
       addProductFunctionDeclaration,
@@ -309,7 +309,7 @@ const handleGeminiRequest = async (req, res) => {
           },
         },
       ],
-     "always respond in hindi"
+     "always respond in the language user has used to give command and respond in non technical way"
     );
       res.status(200).json({ message: result2.response.text() });
     } else {

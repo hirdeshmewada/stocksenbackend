@@ -34,20 +34,20 @@ const addPurchase = async (req, res) => {
           parseInt(myProductData.stock) + parseInt(quantityPurchased);
         let temp = {
           productID: myProductData._id,
-          quantityPurchased: quantityPurchased * myProductData.stock,
+          quantityPurchased: quantityPurchased,
+          totalPurchaseAmount: quantityPurchased * myProductData.price,
         };
-        console.log("1")
+
         tempProducts.push(temp);
-        console.log("1")
+
         purchasedProducts = myProductData;
-        console.log("1")
+
         await myProductData.save({ session });
-        console.log("1")
       }
 
       const addPurchaseDetails = new Purchase({
         userID,
-        purchasedProducts:tempProducts,
+        purchasedProducts: tempProducts,
         purchaseDate: new Date(),
       });
       const savedPurchase = await addPurchaseDetails.save({ session });

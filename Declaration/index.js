@@ -96,34 +96,25 @@ const addSalesFunctionDeclaration = {
         type: "STRING",
         description: "Unique identifier for the user making the sale",
       },
-      productID: {
+      productName: {
         type: "STRING",
-        description: "Unique identifier for the product being sold",
+        description: "Product Name for the product being sold",
       },
-      storeID: {
+      storeName: {
         type: "STRING",
-        description: "Unique identifier for the store where the sale occurred",
+        description: "Store name for the store where the sale occurred",
       },
       stockSold: {
         type: "NUMBER",
         description: "Quantity of stock sold",
       },
-      saleDate: {
-        type: "STRING",
-        description: "Date of the sale in ISO format",
-      },
-      totalSaleAmount: {
-        type: "NUMBER",
-        description: "Total amount of the sale",
-      },
+
     },
     required: [
       "userID",
-      "productID",
-      "storeID",
+      "productName",
+      "storeName",
       "stockSold",
-      "saleDate",
-      "totalSaleAmount",
     ],
   },
 };

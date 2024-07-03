@@ -1,5 +1,8 @@
 const Sales = require("../models/sales");
 const soldStock = require("../controller/soldStock");
+const Store = require("../models/store");
+const Product = require("../models/Product");
+const { default: mongoose } = require("mongoose");
 
 const getMonthlySales = async (req, res) => {
   if (req?.LLM === true) {
@@ -40,7 +43,9 @@ const getMonthlySales = async (req, res) => {
     res.status(200).json({ salesAmount });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: `Error fetching monthly sales: ${err.message}` });
+    res
+      .status(500)
+      .json({ error: `Error fetching monthly sales: ${err.message}` });
   }
 };
 
@@ -70,7 +75,9 @@ const getTotalSalesAmount = async (req, res) => {
 
     res.status(200).json({ totalSaleAmount });
   } catch (err) {
-    res.status(500).send(`Error calculating total sales amount: ${err.message}`);
+    res
+      .status(500)
+      .send(`Error calculating total sales amount: ${err.message}`);
   }
 };
 
@@ -103,22 +110,55 @@ const getSalesData = async (req, res) => {
 };
 
 const addSales = async (req, res) => {
-  const { userID, productID, storeID, stockSold, saleDate, totalSaleAmount } = req.body;
+  const {
+    userID,
+    productName,
+    storeName,
+    stockSold,
+    saleDate,
+    totalSaleAmount,
+  } = req.body;
 
   if (req?.LLM === true) {
     try {
+      const session = await mongoose.startSession();
+      session.startTransaction();
+      const myProductData = await Product.findOne({
+        name: productName.toLowerCase(),
+      }).session(session);
+      console.log("myProductData", myProductData);
+      if (!myProductData) {
+        throw new Error("Product not found");
+      }
+      // myProductData.stock -= stockSold;
+      // await myProductData.save({ session });
+      let totalSaleAmount = myProductData.price * parseInt(stockSold);
+      console.log("totalSaleAmount", totalSaleAmount,stockSold,);
+      // Create a regular expression to match any substring of the storeName
+      const regex = new RegExp(storeName.split(" ").join("|"), "i");
+
+      // Use Mongoose to find documents with names that match the regex
+      const myStoreData = await Store.findOne({
+        name: { $regex: regex },
+      }).session(session);
+      console.log("myStoreData", myStoreData);
+      if (!myStoreData) {
+        throw new Error("Store not found");
+      }
+
       const addSale = new Sales({
         userID,
-        ProductID: productID,
-        StoreID: storeID,
+        ProductID: myProductData._id,
+        StoreID: myStoreData._id,
         StockSold: stockSold,
-        SaleDate: saleDate,
+        SaleDate: new Date(),
         TotalSaleAmount: totalSaleAmount,
       });
 
-      const result = await addSale.save();
-      await soldStock(productID, stockSold); // Assuming soldStock handles its own errors
-
+      const result = await addSale.save({ session });
+      await soldStock(myProductData._id, stockSold); // Assuming soldStock handles its own errors
+      await session.commitTransaction();
+      session.endSession();
       return result; // Return result if in LLM mode
     } catch (err) {
       console.error(err);
@@ -146,8 +186,9 @@ const addSales = async (req, res) => {
   }
 };
 
-
-
-
-
-module.exports = { addSales, getMonthlySales, getSalesData,  getTotalSalesAmount};
+module.exports = {
+  addSales,
+  getMonthlySales,
+  getSalesData,
+  getTotalSalesAmount,
+};
