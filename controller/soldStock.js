@@ -1,5 +1,5 @@
 const Sales = require("../models/sales");
-const Product = require("../models/Product").default;
+const Product = require("../models/product").default;
 
 const soldStock = async (productID, stockSoldData, req = null) => {
   // If req.LLM is provided and true, handle LLM mode

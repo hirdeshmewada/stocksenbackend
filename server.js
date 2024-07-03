@@ -8,7 +8,6 @@ const voice = require("./router/voice");
 const cors = require("cors");
 const User = require("./models/users");
 const Product = require("./models/product").default;
-
 const app = express();
 const PORT = 4000;
 main();

@@ -1,4 +1,4 @@
-const Product = require("../models/Product").default;
+const Product = require("../models/product").default;
 
 const updateProductPrice = async (name, newPrice) => {
   try {
