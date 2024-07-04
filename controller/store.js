@@ -1,4 +1,4 @@
-const Store = require("../models/Store");
+const Store = require("../models/store");
 
 const addStore = async (req, res) => {
   // Check if LLM mode is enabled

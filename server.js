@@ -7,7 +7,7 @@ const salesRoute = require("./router/sales");
 const voice = require("./router/voice");
 const cors = require("cors");
 const User = require("./models/users");
-const Product = require("./models/Product");
+const Product = require("./models/product");
 
 
 const app = express();
@@ -86,6 +86,6 @@ app.get("/testget", async (req, res) => {
 });
 
 // Here we are listening to the server
-app.listen(PORT, () => {
+app.listen(process.env.PORT, () => {
   console.log("I am live again");
 });

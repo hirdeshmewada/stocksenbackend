@@ -1,6 +1,6 @@
-const Product = require("../models/Product");
-const Purchase = require("../models/Purchase");
-const Sales = require("../models/Sales");
+const Product = require("../models/product");
+const Purchase = require("../models/purchase");
+const Sales = require("../models/sales");
 
 // Add Post
 const addProduct = async (req, res) => {
