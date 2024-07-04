@@ -15,6 +15,9 @@ const updateProductPrice = async (name, newPrice) => {
       return { success: false, message: "Product not found" };
     }
 
+    //
+    //
+    //
     product.price = priceValue;
     product.lastModified = Date.now();
     await product.save();
