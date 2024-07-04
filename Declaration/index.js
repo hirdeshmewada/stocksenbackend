@@ -40,7 +40,7 @@ const getPurchaseDataFunctionDeclaration = {
       userID: {
         type: "STRING",
         description:
-          "Unique identifier for the user whose purchase data is to be retrieved in english",
+          "Unique identifier for the user whose purchase data is to be retrieved",
       },
     },
     required: ["userID"],
@@ -108,14 +108,8 @@ const addSalesFunctionDeclaration = {
         type: "NUMBER",
         description: "Quantity of stock sold",
       },
-
     },
-    required: [
-      "userID",
-      "productName",
-      "storeName",
-      "stockSold",
-    ],
+    required: ["userID", "productName", "storeName", "stockSold"],
   },
 };
 
@@ -258,7 +252,7 @@ const addProductFunctionDeclaration = {
       },
       description: {
         type: "STRING",
-        description: "Description of the product",
+        description: "Description of the product write in user given english",
       },
       price: {
         type: "NUMBER",
@@ -319,7 +313,7 @@ const updateSelectedProductFunctionDeclaration = {
       },
       description: {
         type: "STRING",
-        description: "Updated description of the product",
+        description: "Updated description of the product in same language user give ",
       },
       price: {
         type: "NUMBER",
@@ -343,7 +337,7 @@ const getProductByNameFunctionDeclaration = {
       name: {
         type: "STRING",
         description:
-          "Name of the product to retrieve information for.always translate word into english",
+          "Name of the product to retrieve information and always translate product name into english language ",
       },
     },
     required: ["name"],

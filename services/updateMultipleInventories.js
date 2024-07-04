@@ -1,4 +1,5 @@
-const Product = require("../models/product").default;
+﻿const Product = require("../models/Product");
+
 
 const updateMultipleInventories = async (inventoryUpdates) => {
   try {
