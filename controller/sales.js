@@ -1,8 +1,8 @@
 const Sales = require("../models/sales");
 const soldStock = require("../controller/soldStock");
 const Store = require("../models/store");
-const Product = require("../models/product").default;
 const { default: mongoose } = require("mongoose");
+const Product = require("../models/Product");
 
 const getMonthlySales = async (req, res) => {
   if (req?.LLM === true) {
@@ -135,8 +135,7 @@ const addSales = async (req, res) => {
       let totalSaleAmount = myProductData.price * parseInt(stockSold);
       console.log("totalSaleAmount", totalSaleAmount, stockSold);
       // Create a regular expression to match any substring of the storeName
-      const regex = new RegExp(storeName.split(" ").join("|"), "i");
-
+      const regex = new RegExp(storeName.toLowerCase().split(" ").join("|"), "i");
       // Use Mongoose to find documents with names that match the regex
       const myStoreData = await Store.findOne({
         name: { $regex: regex },

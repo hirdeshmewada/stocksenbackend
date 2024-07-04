@@ -1,5 +1,5 @@
+const Product = require("../models/Product");
 const Purchase = require("../models/purchase");
-const Product = require("../models/Product").default;
 const mongoose = require("mongoose");
 
 // Add Purchase Details
@@ -24,7 +24,7 @@ const addPurchase = async (req, res) => {
           quantityPurchased
         );
         const myProductData = await Product.findOne({
-          name: productName.toLowerCase(),
+          name: { $regex: new RegExp(productName, "i") },
         }).session(session);
         console.log("myProductData", myProductData);
         if (!myProductData) {

@@ -1,4 +1,5 @@
-const Product = require("../models/Product").default;
+const Product = require("../models/Product");
+
 
 const purchaseStock = async (req, res) => {
   // Check if LLM mode is enabled

@@ -16,7 +16,7 @@ const addPurchaseFunctionDeclaration = {
           properties: {
             productName: {
               type: "STRING",
-              description: "name of the purchased product",
+              description: "name of the purchased product in english",
             },
             quantityPurchased: {
               type: "NUMBER",
@@ -40,7 +40,7 @@ const getPurchaseDataFunctionDeclaration = {
       userID: {
         type: "STRING",
         description:
-          "Unique identifier for the user whose purchase data is to be retrieved",
+          "Unique identifier for the user whose purchase data is to be retrieved in english",
       },
     },
     required: ["userID"],
@@ -98,7 +98,7 @@ const addSalesFunctionDeclaration = {
       },
       productName: {
         type: "STRING",
-        description: "Product Name for the product being sold",
+        description: "Product Name for the product being sold in english",
       },
       storeName: {
         type: "STRING",
@@ -195,7 +195,7 @@ const addStoreFunctionDeclaration = {
       },
       name: {
         type: "STRING",
-        description: "Name of the store",
+        description: "Name of the store ",
       },
       category: {
         type: "STRING",
@@ -246,7 +246,7 @@ const addProductFunctionDeclaration = {
       },
       name: {
         type: "STRING",
-        description: "Name of the product",
+        description: "Name of the product in english",
       },
       manufacturer: {
         type: "STRING",
@@ -293,7 +293,7 @@ const deleteSelectedProductFunctionDeclaration = {
     properties: {
       name: {
         type: "STRING",
-        description: "name of the product to be deleted",
+        description: "name of the product to be deleted in english",
       },
     },
     required: ["name"],
@@ -311,7 +311,7 @@ const updateSelectedProductFunctionDeclaration = {
       },
       name: {
         type: "STRING",
-        description: "name of the product",
+        description: "name of the product in english",
       },
       manufacturer: {
         type: "STRING",
