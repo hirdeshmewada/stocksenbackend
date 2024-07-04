@@ -1,5 +1,4 @@
-const Store = require("../models/store");
-
+const Store = require("../models/Store");
 
 const addStore = async (req, res) => {
   // Check if LLM mode is enabled
@@ -43,7 +42,9 @@ const getAllStores = async (req, res) => {
   // Check if LLM mode is enabled
   if (req?.LLM === true) {
     try {
-      const findAllStores = await Store.find({ userID: req?.params?.userID }).sort({ _id: -1 });
+      const findAllStores = await Store.find({
+        userID: req?.params?.userID,
+      }).sort({ _id: -1 });
       return findAllStores; // Return the result for LLM mode
     } catch (error) {
       console.error("Error fetching all stores: ", error);
@@ -53,14 +54,15 @@ const getAllStores = async (req, res) => {
 
   // Standard API Mode
   try {
-    const findAllStores = await Store.find({ userID: req?.params?.userID }).sort({ _id: -1 });
+    const findAllStores = await Store.find({
+      userID: req?.params?.userID,
+    }).sort({ _id: -1 });
     res.json(findAllStores);
   } catch (error) {
     console.error("Error fetching all stores: ", error);
     res.status(500).send("Server error");
   }
 };
-
 
 const editStore = async (req, res) => {
   const { name, category, address, city, image } = req.body;
@@ -104,6 +106,4 @@ const editStore = async (req, res) => {
   }
 };
 
-
-
-module.exports = { addStore, getAllStores,editStore };
+module.exports = { addStore, getAllStores, editStore };

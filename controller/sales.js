@@ -1,8 +1,9 @@
-const Sales = require("../models/sales");
+const Sales = require("../models/Sales");
 const soldStock = require("../controller/soldStock");
-const Store = require("../models/store");
+
 const { default: mongoose } = require("mongoose");
 const Product = require("../models/Product");
+const Store = require("../models/Store");
 
 const getMonthlySales = async (req, res) => {
   if (req?.LLM === true) {
