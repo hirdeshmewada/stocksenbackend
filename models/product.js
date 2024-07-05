@@ -13,16 +13,16 @@ const ProductSchema = new mongoose.Schema(
     },
     manufacturer: {
       type: String,
-      required: true,
+      required: false,
     },
     stock: {
       type: Number,
-      required: true,
+      required: false,
     },
     description: String,
     price: {
       type: Number,
-      required: true,
+      required: false,
       min: [0, 'Price must be a positive number'], // Validation for price
     },
   },
