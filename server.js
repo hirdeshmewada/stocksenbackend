@@ -4,11 +4,12 @@ const productRoute = require("./router/product");
 const storeRoute = require("./router/store");
 const purchaseRoute = require("./router/purchase");
 const salesRoute = require("./router/sales");
+const userInteraction = require("./router/user/voice");
+
 const voice = require("./router/voice");
 const cors = require("cors");
 const User = require("./models/users");
 const Product = require("./models/product");
-
 
 const app = express();
 const PORT = 4000;
@@ -29,6 +30,7 @@ app.use("/api/purchase", purchaseRoute);
 app.use("/api/sales", salesRoute);
 
 app.use("/api/gemini", voice);
+app.use("/api/user/gemini", userInteraction);
 
 // ------------- Signin --------------
 let userAuthCheck;
