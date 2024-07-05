@@ -309,7 +309,7 @@ const handleGeminiRequest = async (req, res) => {
           },
         },
       ],
-     "always respond in the language user has used to give command and respond in non technical way"
+     "translate the query in english and always respond in the language user has used to give command and respond in non technical way"
     );
       res.status(200).json({ message: result2.response.text() });
     } else {
