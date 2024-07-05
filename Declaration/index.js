@@ -337,7 +337,7 @@ const getProductByNameFunctionDeclaration = {
       name: {
         type: "STRING",
         description:
-          "Name of the product to retrieve information and always translate product name into english language ",
+          "Name of the product in english",
       },
     },
     required: ["name"],
