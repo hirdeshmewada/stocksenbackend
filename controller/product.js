@@ -1,6 +1,8 @@
 const Product = require("../models/product");
 const Purchase = require("../models/purchase");
 const Sales = require("../models/sales");
+const generateDynamicPattern = require("../util/generateDynamicPattern");
+
 
 // Add Post
 const addProduct = async (req, res) => {
@@ -14,7 +16,7 @@ const addProduct = async (req, res) => {
       }
       const newProduct = new Product({
         userID: req?.body?.userId,
-        name: req?.body?.name.toLowerCase(),
+        name: req?.body?.name,
         manufacturer: req?.body?.manufacturer,
         stock: req?.body?.stock,
         description: req?.body?.description,
@@ -49,8 +51,9 @@ const getProductByName = async (req, res) => {
     // Check if LLM mode is enabled
 
     if (req.LLM === true) {
-      const productName = req?.params?.name.toLowerCase();
-      const product = await Product.findOne({ name: productName });
+      const productName = generateDynamicPattern(req?.params?.name) 
+      console.log(productName);
+      const product = await Product.findOne({ name: { $regex: productName } });
       console.log(product);
       if (!product) {
         return "Product not found"; // Return message if in LLM mode
@@ -95,8 +98,10 @@ const getAllProducts = async (req, res) => {
 const deleteSelectedProduct = async (req, res) => {
   try {
     if (req.LLM === true) {
+      const productName = generateDynamicPattern(req?.params?.name) 
+
       const deleteProduct = await Product.deleteOne({
-        name: req.body.name.toLowerCase(),
+        name: {$regex:productName}
       });
       console.log("req.LLM", req.LLM, "deleteProduct", deleteProduct);
       // const deletePurchaseProduct = await Purchase.deleteOne({ ProductID: req?.params?.id });
@@ -140,8 +145,10 @@ const updateSelectedProduct = async (req, res) => {
 
     // Check if LLM mode is enabled
     if (req.LLM === true) {
+      const productName = generateDynamicPattern(req?.params?.name) 
+
       const updatedResult = await Product.findOneAndUpdate(
-        { name: req?.body?.name.toLowerCase() },
+        { name: {$regex:productName} },
         updateFields,
         { new: true }
       );
@@ -165,10 +172,11 @@ const updateSelectedProduct = async (req, res) => {
 const searchProduct = async (req, res) => {
   try {
     if (req.LLM === true) {
-      const searchTerm = req?.query?.searchTerm;
+      const searchTerm = generateDynamicPattern(req?.query?.searchTerm)
+      
       const products = await Product.find(
         {
-          name: { $regex: searchTerm, $options: "i" },
+          name: { $regex: searchTerm},
         },
         "name manufacturer price"
       );

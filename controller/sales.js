@@ -4,6 +4,7 @@ const soldStock = require("../controller/soldStock");
 const { default: mongoose } = require("mongoose");
 const Product = require("../models/product");
 const Store = require("../models/store");
+const generateDynamicPattern = require("../util/generateDynamicPattern");
 
 const getMonthlySales = async (req, res) => {
   if (req?.LLM === true) {
@@ -124,8 +125,9 @@ const addSales = async (req, res) => {
     try {
       const session = await mongoose.startSession();
       session.startTransaction();
+      
       const myProductData = await Product.findOne({
-        name: productName.toLowerCase(),
+        name: {$regex: generateDynamicPattern(productName)},
       }).session(session);
       console.log("myProductData", myProductData);
       if (!myProductData) {
@@ -142,7 +144,7 @@ const addSales = async (req, res) => {
       );
       // Use Mongoose to find documents with names that match the regex
       const myStoreData = await Store.findOne({
-        name: { $regex: regex },
+        name: { $regex: generateDynamicPattern(storeName) },
       }).session(session);
       console.log("myStoreData", myStoreData);
       if (!myStoreData) {

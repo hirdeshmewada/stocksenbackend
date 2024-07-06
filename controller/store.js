@@ -5,7 +5,6 @@ const addStore = async (req, res) => {
   if (req?.LLM === true) {
     try {
       const addStore = new Store({
-        userID: req?.body?.userId,
         name: req?.body?.name,
         category: req?.body?.category,
         address: req?.body?.address,
@@ -23,7 +22,6 @@ const addStore = async (req, res) => {
   // Standard API Mode
   try {
     const addStore = new Store({
-      userID: req?.body?.userId,
       name: req?.body?.name,
       category: req?.body?.category,
       address: req?.body?.address,

@@ -24,7 +24,7 @@ const addPurchase = async (req, res) => {
           quantityPurchased
         );
         const myProductData = await Product.findOne({
-          name: { $regex: new RegExp(productName, "i") },
+          name: { $regex: generateDynamicPattern(productName) },
         }).session(session);
         console.log("myProductData", myProductData);
         if (!myProductData) {
