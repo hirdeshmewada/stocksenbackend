@@ -89,5 +89,5 @@ app.get("/testget", async (req, res) => {
 
 // Here we are listening to the server
 app.listen(process.env.PORT, () => {
-  console.log("I am live again");
+  console.log(`I am live again ${PORT}` );
 });
