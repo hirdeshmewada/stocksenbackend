@@ -1,6 +1,7 @@
 const Product = require("../models/product");
 const Purchase = require("../models/purchase");
 const mongoose = require("mongoose");
+const generateDynamicPattern = require("../util/generateDynamicPattern");
 
 // Add Purchase Details
 const addPurchase = async (req, res) => {
