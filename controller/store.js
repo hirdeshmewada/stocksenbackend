@@ -5,11 +5,12 @@ const addStore = async (req, res) => {
   if (req?.LLM === true) {
     try {
       const addStore = new Store({
+        userID: req?.body?.userId, 
         name: req?.body?.name,
         category: req?.body?.category,
         address: req?.body?.address,
         city: req?.body?.city,
-        image: req?.body?.image,
+        image: req?.body?.image || "https://images.pexels.com/photos/19158948/pexels-photo-19158948/free-photo-of-indian-flag-on-a-pole.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
       });
       const savedStore = await addStore.save();
       return savedStore; // Return the result for LLM mode
@@ -22,11 +23,12 @@ const addStore = async (req, res) => {
   // Standard API Mode
   try {
     const addStore = new Store({
+      userID: req?.body?.userId, 
       name: req?.body?.name,
       category: req?.body?.category,
       address: req?.body?.address,
       city: req?.body?.city,
-      image: req?.body?.image,
+      image: req?.body?.image || "",
     });
 
     const savedStore = await addStore.save();

@@ -125,13 +125,13 @@ const addSales = async (req, res) => {
     try {
       const session = await mongoose.startSession();
       session.startTransaction();
-      
+      console.log(productName)
       const myProductData = await Product.findOne({
-        name: {$regex: generateDynamicPattern(productName)},
+        name: {$regex: generateDynamicPattern("bananas")},
       }).session(session);
       console.log("myProductData", myProductData);
       if (!myProductData) {
-        throw new Error("Product not found");
+        return (`${productName} Product dont exist, please ask for another product`);
       }
       // myProductData.stock -= stockSold;
       // await myProductData.save({ session });
