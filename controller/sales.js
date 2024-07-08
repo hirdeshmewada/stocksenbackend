@@ -16,10 +16,10 @@ const getMonthlySales = async (req, res) => {
       salesAmount.length = 12;
       salesAmount.fill(0);
 
-      sales.forEach((sale) => {
-        const monthIndex = parseInt(sale.SaleDate.split("-")[1]) - 1;
-        salesAmount[monthIndex] += sale.TotalSaleAmount;
-      });
+      // sales.forEach((sale) => {
+      //   const monthIndex = parseInt(sale?.SaleDate.split("-")[1]) - 1;
+      //   salesAmount[monthIndex] += sale?.TotalSaleAmount;
+      // });
 
       return { salesAmount }; // Return data if in LLM mode
     } catch (err) {
@@ -37,10 +37,10 @@ const getMonthlySales = async (req, res) => {
     salesAmount.length = 12;
     salesAmount.fill(0);
 
-    sales.forEach((sale) => {
-      const monthIndex = parseInt(sale?.SaleDate.split("-")[1]) - 1;
-      salesAmount[monthIndex] += sale?.TotalSaleAmount;
-    });
+    // sales.forEach((sale) => {
+    //   const monthIndex = parseInt(sale?.SaleDate.split("-")[1]) - 1;
+    //   salesAmount[monthIndex] += sale?.TotalSaleAmount;
+    // });
 
     res.status(200).json({ salesAmount });
   } catch (err) {
@@ -147,7 +147,6 @@ const addSales = async (req, res) => {
     try {
       let tempProducts = [];
       let totalSaleAmount = 0;
-
       for (const product of products) {
         const { productID, stockSold } = product;
         const myProductData = await Product.findOne({ _id: productID }).session(
@@ -171,11 +170,15 @@ const addSales = async (req, res) => {
         await myProductData.save({ session });
       }
 
-      const storeID = await Sales.findById(req.params.storeID);
+      // const storeID = await Sales.findById(req.params.storeID);
+      // if (!storeID) {
+      //   return "store dont exit";
+      // }
+      console.log(req.body)
       const addSalesDetails = new Sales({
         userID,
         soldProducts: tempProducts,
-        storeID: storeID?._id,
+        storeID: req?.body?.storeID,
         saleDate: new Date(saleDate),
         totalSaleAmount: totalSaleAmount,
       });
