@@ -127,7 +127,7 @@ const addSales = async (req, res) => {
         userID,
         soldProducts: tempProducts,
         storeID: storeID?._id,
-        saleDate: new Date(saleDate),
+        saleDate: new Date(),
         totalSaleAmount: totalSaleAmount,
       });
 
