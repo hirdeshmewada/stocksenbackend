@@ -51,9 +51,12 @@ const getProductByName = async (req, res) => {
     // Check if LLM mode is enabled
 
     if (req.LLM === true) {
-      const productName = generateDynamicPattern(req?.params?.name) 
+      // const productName = generateDynamicPattern(req?.params?.name) 
+
+      const productName = req?.params?.name 
+
       console.log(productName);
-      const product = await Product.findOne({ name: { $regex: productName } });
+      const product = await Product.findOne({ name: { $in: generateDynamicPattern(productName) } });
       console.log(product);
       if (!product) {
         return "Product not found"; // Return message if in LLM mode
@@ -206,3 +209,4 @@ module.exports = {
   searchProduct,
   getProductByName,
 };
+

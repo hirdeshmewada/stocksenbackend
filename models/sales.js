@@ -7,28 +7,38 @@ const SaleSchema = new mongoose.Schema(
       ref: "users",
       required: true,
     },
-    ProductID: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "product",
-      required: true,
-    },
-    StoreID: {
+    
+    soldProducts: [
+      {
+        productID: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "product",
+          required: true,
+        },
+        quantitySold: {
+          type: Number,
+          required: false,
+        },
+        totalSaleAmount: {
+          type: Number,
+          required: false,
+        },
+      },
+    ],
+    storeID: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "store",
       required: true,
     },
-    StockSold: {
+    saleDate: {
+      type: Date,
+      required: false,
+    },
+    totalSaleAmount: {
       type: Number,
-      required: true,
+      required: false,
     },
-    SaleDate: {
-      type: String,
-      required: true,
-    },
-    TotalSaleAmount: {
-      type: Number,
-      required: true,
-    },
+    
   },
   { timestamps: true }
 );

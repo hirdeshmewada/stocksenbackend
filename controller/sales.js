@@ -38,8 +38,8 @@ const getMonthlySales = async (req, res) => {
     salesAmount.fill(0);
 
     sales.forEach((sale) => {
-      const monthIndex = parseInt(sale.SaleDate.split("-")[1]) - 1;
-      salesAmount[monthIndex] += sale.TotalSaleAmount;
+      const monthIndex = parseInt(sale?.SaleDate.split("-")[1]) - 1;
+      salesAmount[monthIndex] += sale?.TotalSaleAmount;
     });
 
     res.status(200).json({ salesAmount });
@@ -82,14 +82,126 @@ const getTotalSalesAmount = async (req, res) => {
       .send(`Error calculating total sales amount: ${err.message}`);
   }
 };
+const addSales = async (req, res) => {
+  const { userID, products, storeName, saleDate } = req.body;
+  console.log("products", JSON.stringify(products));
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  if (req.LLM === true) {
+    // Logic when LLM is true
+    try {
+      let tempProducts = [];
+      let totalSaleAmount = 0;
+
+      for (const product of products) {
+        const { productName, stockSold } = product;
+        const myProductData = await Product.findOne({
+          name: { $in: generateDynamicPattern(productName) },
+        }).session(session);
+        console.log(myProductData);
+        if (!myProductData) {
+          throw new Error("Product not found");
+        }
+
+        myProductData.stock =
+          parseInt(myProductData.stock) - parseInt(stockSold);
+        let temp = {
+          productID: myProductData._id,
+          quantitySold: parseInt(stockSold),
+          totalSaleAmount: parseInt(stockSold) * myProductData.price,
+        };
+        totalSaleAmount += parseInt(stockSold) * myProductData.price;
+        tempProducts.push(temp);
+
+        await myProductData.save({ session });
+      }
+
+      const storeID = await Store.findOne({
+        name: { $in: generateDynamicPattern(storeName) },
+      });
+      if (!storeID) {
+        return "store dont exit";
+      }
+      const addSalesDetails = new Sales({
+        userID,
+        soldProducts: tempProducts,
+        storeID: storeID?._id,
+        saleDate: new Date(saleDate),
+        totalSaleAmount: totalSaleAmount,
+      });
+
+      const savedSales = await addSalesDetails.save({ session });
+      await session.commitTransaction();
+      session.endSession();
+
+      return savedSales;
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      console.log(error);
+      return error.message;
+    }
+  } else {
+    // Logic when LLM is false
+    try {
+      let tempProducts = [];
+      let totalSaleAmount = 0;
+
+      for (const product of products) {
+        const { productID, stockSold } = product;
+        const myProductData = await Product.findOne({ _id: productID }).session(
+          session
+        );
+
+        if (!myProductData) {
+          throw new Error("Product not found");
+        }
+
+        myProductData.stock =
+          parseInt(myProductData.stock) - parseInt(stockSold);
+        let temp = {
+          productID: myProductData._id,
+          quantitySold: parseInt(stockSold),
+          totalSaleAmount: parseInt(stockSold) * myProductData.price,
+        };
+        totalSaleAmount += parseInt(stockSold) * myProductData.price;
+        tempProducts.push(temp);
+
+        await myProductData.save({ session });
+      }
+
+      const storeID = await Sales.findById(req.params.storeID);
+      const addSalesDetails = new Sales({
+        userID,
+        soldProducts: tempProducts,
+        storeID: storeID?._id,
+        saleDate: new Date(saleDate),
+        totalSaleAmount: totalSaleAmount,
+      });
+
+      const savedSales = await addSalesDetails.save({ session });
+      await session.commitTransaction();
+      session.endSession();
+
+      res.status(200).send(savedSales);
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      console.log(error);
+      res.status(402).send(error.message);
+    }
+  }
+};
 
 const getSalesData = async (req, res) => {
   if (req?.LLM === true) {
     try {
-      const findAllSalesData = await Sales.find({ userID: req?.params?.userID })
-        .sort({ _id: -1 })
-        .populate("ProductID")
-        .populate("StoreID");
+      const findAllSalesData = await Sales.find({
+        userID: req?.params?.userID,
+      }).sort({ _id: -1 });
+      // .populate("soldProducts.productID")
+      // .populate("storeID");
 
       return findAllSalesData; // Return data if in LLM mode
     } catch (err) {
@@ -102,92 +214,12 @@ const getSalesData = async (req, res) => {
   try {
     const findAllSalesData = await Sales.find({ userID: req?.params?.userID })
       .sort({ _id: -1 })
-      .populate("ProductID")
-      .populate("StoreID");
+      .populate("soldProducts.productID")
+      .populate("storeID");
 
     res.status(200).json(findAllSalesData);
   } catch (err) {
     res.status(500).send(`Error fetching sales data: ${err.message}`);
-  }
-};
-
-const addSales = async (req, res) => {
-  const {
-    userID,
-    productName,
-    storeName,
-    stockSold,
-    saleDate,
-    totalSaleAmount,
-  } = req.body;
-
-  if (req?.LLM === true) {
-    try {
-      const session = await mongoose.startSession();
-      session.startTransaction();
-      console.log(productName)
-      const myProductData = await Product.findOne({
-        name: {$regex: generateDynamicPattern("bananas")},
-      }).session(session);
-      console.log("myProductData", myProductData);
-      if (!myProductData) {
-        return (`${productName} Product dont exist, please ask for another product`);
-      }
-      // myProductData.stock -= stockSold;
-      // await myProductData.save({ session });
-      let totalSaleAmount = myProductData.price * parseInt(stockSold);
-      console.log("totalSaleAmount", totalSaleAmount, stockSold);
-      // Create a regular expression to match any substring of the storeName
-      const regex = new RegExp(
-        storeName.toLowerCase().split(" ").join("|"),
-        "i"
-      );
-      // Use Mongoose to find documents with names that match the regex
-      const myStoreData = await Store.findOne({
-        name: { $regex: generateDynamicPattern(storeName) },
-      }).session(session);
-      console.log("myStoreData", myStoreData);
-      if (!myStoreData) {
-        throw new Error("Store not found");
-      }
-
-      const addSale = new Sales({
-        userID,
-        ProductID: myProductData._id,
-        StoreID: myStoreData._id,
-        StockSold: stockSold,
-        SaleDate: new Date(),
-        TotalSaleAmount: totalSaleAmount,
-      });
-
-      const result = await addSale.save({ session });
-      await soldStock(myProductData._id, stockSold); // Assuming soldStock handles its own errors
-      await session.commitTransaction();
-      session.endSession();
-      return result; // Return result if in LLM mode
-    } catch (err) {
-      console.error(err);
-      return `Error adding sales: ${err.message}`; // Return error message if in LLM mode
-    }
-  }
-
-  // Standard API mode
-  try {
-    const addSale = new Sales({
-      userID,
-      ProductID: productID,
-      StoreID: storeID,
-      StockSold: stockSold,
-      SaleDate: saleDate,
-      TotalSaleAmount: totalSaleAmount,
-    });
-
-    const result = await addSale.save();
-    await soldStock(productID, stockSold);
-
-    res.status(200).send(result);
-  } catch (err) {
-    res.status(402).send(err);
   }
 };
 

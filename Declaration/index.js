@@ -90,28 +90,39 @@ const addSalesFunctionDeclaration = {
   name: "addSales",
   parameters: {
     type: "OBJECT",
-    description: "Add a new sales record and update the stock sold",
+    description: "Add a new sales record and update the stock sold for multiple products using given storen name and product names",
     properties: {
       userID: {
         type: "STRING",
         description: "Unique identifier for the user making the sale",
       },
-      productName: {
-        type: "STRING",
-        description: "Product Name for the product being sold in english",
+      products: {
+        type: "ARRAY",
+        description: "Array of products being sold",
+        items: {
+          type: "OBJECT",
+          properties: {
+            productName: {
+              type: "STRING",
+              description: "english name for the product being sold",
+            },
+            stockSold: {
+              type: "NUMBER",
+              description: "Quantity of the product sold",
+            },
+          },
+          required: ["productName","stockSold"],
+        },
       },
       storeName: {
         type: "STRING",
-        description: "Store name for the store where the sale occurred",
-      },
-      stockSold: {
-        type: "NUMBER",
-        description: "Quantity of stock sold",
+        description: "name of the store where the sale occurred",
       },
     },
-    required: ["userID", "productName", "storeName", "stockSold"],
+    required: ["userID", "products", "storeName"],
   },
 };
+
 
 const getSalesDataFunctionDeclaration = {
   name: "getSalesData",
@@ -353,7 +364,7 @@ module.exports = {
   getSalesDataFunctionDeclaration,
   getTotalSalesAmountFunctionDeclaration,
   soldStockFunctionDeclaration,
-  getAllStoresFunctionDeclaration,
+  getAllStoresFunctionDeclaration, 
   addProductFunctionDeclaration,
   getAllProductsFunctionDeclaration,
   deleteSelectedProductFunctionDeclaration,
