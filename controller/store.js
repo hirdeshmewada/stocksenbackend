@@ -71,7 +71,9 @@ const editStore = async (req, res) => {
   if (req?.LLM === true) {
     try {
       const updatedStore = await Store.findOneAndUpdate(
-        { name: req?.body?.name },
+        { $text: { $search: req?.body?.name } },
+        { score: { $meta: "textScore" } }
+      ).sort({ score: { $meta: "textScore" } },
         { name, category, address, city, image },
         { new: true } // Return the updated document
       );

@@ -251,7 +251,7 @@ const addProductFunctionDeclaration = {
       },
       name: {
         type: "STRING",
-        description: "Name of the product in english",
+        description: "Name of the product in english and always taken as singular",
       },
       manufacturer: {
         type: "STRING",

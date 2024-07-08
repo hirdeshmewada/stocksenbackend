@@ -96,9 +96,9 @@ const addSales = async (req, res) => {
 
       for (const product of products) {
         const { productName, stockSold } = product;
-        const myProductData = await Product.findOne({
-          name: { $in: generateDynamicPattern(productName) },
-        }).session(session);
+        const myProductData = await Product.findOne( { $text: { $search: productName } },
+          { score: { $meta: "textScore" } }
+        ).sort({ score: { $meta: "textScore" } }).session(session);
         console.log(myProductData);
         if (!myProductData) {
           throw new Error("Product not found");
@@ -117,9 +117,9 @@ const addSales = async (req, res) => {
         await myProductData.save({ session });
       }
 
-      const storeID = await Store.findOne({
-        name: { $in: generateDynamicPattern(storeName) },
-      });
+      const storeID = await Store.findOne( { $text: { $search: storeName } },
+        { score: { $meta: "textScore" } }
+      ).sort({ score: { $meta: "textScore" } });
       if (!storeID) {
         return "store dont exit";
       }

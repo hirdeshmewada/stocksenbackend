@@ -1,22 +1,18 @@
 function generateDynamicPattern(query) {
-  // Split the query into individual words
   const words = query.split(" ");
   console.log("words", words);
+  if (typeof words == "object" && words.length > 1) {
 
-  // Normalize the words by removing special characters and converting to lowercase
-  const normalizedWords = words.map(word =>
-    word.toLowerCase().replace(/[^a-zA-Z0-9]/g, '')
-  );
-  console.log("normalizedWords", normalizedWords);
-
-  // Generate regex patterns for each normalized word
-  const regexPatterns = normalizedWords.map(word => {
-    // Match the word with optional special characters or suffixes
-    return new RegExp(`${word.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}.*`, 'i');
-  });
-
-  console.log("regexPatterns", regexPatterns);
-  return regexPatterns;
+    const regexPatterns = words.map((word) => new RegExp(`^${word}$`, "i"));
+    console.log("regexPatterns", regexPatterns);
+    return regexPatterns;
+  } else {
+    const cleanWord = query.replace(/[^a-zA-Z0-9]/g, " ");
+    const word = cleanWord.split(" ");
+    console.log("cleanWord", cleanWord);
+    const regexPatterns = word.map((word) => new RegExp(`^${word}$`, "i"));
+    return regexPatterns;
+  }
 }
 
 module.exports = generateDynamicPattern;

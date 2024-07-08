@@ -3,7 +3,6 @@ const Purchase = require("../models/purchase");
 const Sales = require("../models/sales");
 const generateDynamicPattern = require("../util/generateDynamicPattern");
 
-
 // Add Post
 const addProduct = async (req, res) => {
   try {
@@ -51,12 +50,16 @@ const getProductByName = async (req, res) => {
     // Check if LLM mode is enabled
 
     if (req.LLM === true) {
-      // const productName = generateDynamicPattern(req?.params?.name) 
+      // const productName = generateDynamicPattern(req?.params?.name)
 
-      const productName = req?.params?.name 
+      const productName = req?.params?.name;
 
       console.log(productName);
-      const product = await Product.findOne({ name: { $in: generateDynamicPattern(productName) } });
+      const product = await Product.findOne(
+        { $text: { $search: productName } },
+        { score: { $meta: "textScore" } }
+      ).sort({ score: { $meta: "textScore" } });
+
       console.log(product);
       if (!product) {
         return "Product not found"; // Return message if in LLM mode
@@ -101,11 +104,11 @@ const getAllProducts = async (req, res) => {
 const deleteSelectedProduct = async (req, res) => {
   try {
     if (req.LLM === true) {
-      const productName = generateDynamicPattern(req?.params?.name) 
+      const productName = generateDynamicPattern(req?.params?.name);
 
-      const deleteProduct = await Product.deleteOne({
-        name: {$regex:productName}
-      });
+      const deleteProduct = await Product.deleteOne(  { $text: { $search: productName } },
+        { score: { $meta: "textScore" } }
+      ).sort({ score: { $meta: "textScore" } });
       console.log("req.LLM", req.LLM, "deleteProduct", deleteProduct);
       // const deletePurchaseProduct = await Purchase.deleteOne({ ProductID: req?.params?.id });
       // const deleteSaleProduct = await Sales.deleteOne({ ProductID: req?.params?.id });
@@ -148,10 +151,12 @@ const updateSelectedProduct = async (req, res) => {
 
     // Check if LLM mode is enabled
     if (req.LLM === true) {
-      const productName = generateDynamicPattern(req?.params?.name) 
+      const productName = generateDynamicPattern(req?.params?.name);
 
       const updatedResult = await Product.findOneAndUpdate(
-        { name: {$regex:productName} },
+        { $text: { $search: productName } },
+        { score: { $meta: "textScore" } }
+      ).sort({ score: { $meta: "textScore" } },
         updateFields,
         { new: true }
       );
@@ -175,11 +180,11 @@ const updateSelectedProduct = async (req, res) => {
 const searchProduct = async (req, res) => {
   try {
     if (req.LLM === true) {
-      const searchTerm = generateDynamicPattern(req?.query?.searchTerm)
-      
+      const searchTerm = generateDynamicPattern(req?.query?.searchTerm);
+
       const products = await Product.find(
         {
-          name: { $regex: searchTerm},
+          name: { $regex: searchTerm },
         },
         "name manufacturer price"
       );
@@ -209,4 +214,3 @@ module.exports = {
   searchProduct,
   getProductByName,
 };
-

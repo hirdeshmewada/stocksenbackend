@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const ProductSchema = new mongoose.Schema(
   {
@@ -23,11 +23,13 @@ const ProductSchema = new mongoose.Schema(
     price: {
       type: Number,
       required: false,
-      min: [0, 'Price must be a positive number'], // Validation for price
+      min: [0, 'Price must be a positive number'],
     },
   },
   { timestamps: true }
 );
 
-const Product = mongoose.model("product", ProductSchema);
+ProductSchema.index({ name: 'text', description: 'text' });
+
+const Product = mongoose.model('product', ProductSchema);
 module.exports = Product;

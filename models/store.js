@@ -31,6 +31,6 @@ const StoreSchema = new mongoose.Schema(
   },
   { timestamps: false }
 );
-
+StoreSchema.index({name:'text'})
 const Store = mongoose.model("store", StoreSchema);
 module.exports = Store;

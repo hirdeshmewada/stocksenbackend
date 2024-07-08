@@ -24,9 +24,9 @@ const addPurchase = async (req, res) => {
           productName,
           quantityPurchased
         );
-        const myProductData = await Product.findOne({
-          name: { $regex: generateDynamicPattern(productName) },
-        }).session(session);
+        const myProductData = await Product.findOne( { $text: { $search: productName } },
+          { score: { $meta: "textScore" } }
+        ).sort({ score: { $meta: "textScore" } }).session(session);
         console.log("myProductData", myProductData);
         if (!myProductData) {
           throw new Error("Product not found");
