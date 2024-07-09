@@ -13,26 +13,27 @@ const addPurchase = async (req, res) => {
     session.startTransaction();
     console.log(userID, purchasedProducts, new Date());
     try {
+      console.log(userID, purchasedProducts, new Date());
       let tempProducts = [];
-      // Save the purchase transaction
+      let bulkOps = [];
 
       // Update stock for each product in the purchase
       for (const product of purchasedProducts) {
         const { productName, quantityPurchased } = product;
-        console.log(
-          "productName, quantityPurchased",
-          productName,
-          quantityPurchased
-        );
-        const myProductData = await Product.findOne( { $text: { $search: productName } },
+        console.log("productName, quantityPurchased", productName, quantityPurchased);
+
+        const myProductData = await Product.findOne(
+          { $text: { $search: productName } },
           { score: { $meta: "textScore" } }
         ).sort({ score: { $meta: "textScore" } }).session(session);
+
         console.log("myProductData", myProductData);
         if (!myProductData) {
           throw new Error("Product not found");
         }
-        myProductData.stock =
-          parseInt(myProductData.stock) + parseInt(quantityPurchased);
+
+        myProductData.stock = parseInt(myProductData.stock) + parseInt(quantityPurchased);
+
         let temp = {
           productID: myProductData._id,
           quantityPurchased: quantityPurchased,
@@ -41,9 +42,16 @@ const addPurchase = async (req, res) => {
 
         tempProducts.push(temp);
 
-        purchasedProducts = myProductData;
+        bulkOps.push({
+          updateOne: {
+            filter: { _id: myProductData._id },
+            update: { $set: { stock: myProductData.stock } },
+          }
+        });
+      }
 
-        await myProductData.save({ session });
+      if (bulkOps.length > 0) {
+        await Product.bulkWrite(bulkOps, { session });
       }
 
       const addPurchaseDetails = new Purchase({
@@ -51,11 +59,12 @@ const addPurchase = async (req, res) => {
         purchasedProducts: tempProducts,
         purchaseDate: new Date(),
       });
+
       const savedPurchase = await addPurchaseDetails.save({ session });
       await session.commitTransaction();
       session.endSession();
 
-      return savedPurchase; // Return result if in LLM mode
+      return savedPurchase;
     } catch (error) {
       await session.abortTransaction();
       session.endSession();

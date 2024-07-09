@@ -151,7 +151,7 @@ const updateSelectedProduct = async (req, res) => {
 
     // Check if LLM mode is enabled
     if (req.LLM === true) {
-      const productName = generateDynamicPattern(req?.params?.name);
+      const productName = req?.params?.name
 
       const updatedResult = await Product.findOneAndUpdate(
         { $text: { $search: productName } },
@@ -173,6 +173,7 @@ const updateSelectedProduct = async (req, res) => {
     res.json(updatedResult);
   } catch (error) {
     // console.error("Error updating selected product: ", error);
+    console.log(error)
     res.status(500).send("Server error");
   }
 };

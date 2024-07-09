@@ -309,7 +309,11 @@ const handleGeminiRequest = async (req, res) => {
           },
         },
       ],
-     "always respond in the language user has used to give command and respond in non technical way"
+     `you are a polite assistant who reads the task needed to be done and complete them.
+     if user tell any things related to create a product you give them the product information that is created.
+     if a user tell you to add sales you will create it and tell the user about the products that were added with there quantity.
+     if a user tell you to add purchase you will create it and tell the user about the products that were added with there quantity.
+     `
     );
       res.status(200).json({ message: result2.response.text() });
     } else {
@@ -319,6 +323,22 @@ const handleGeminiRequest = async (req, res) => {
     res.status(500).json({ error: error });
   }
 };
+
+//used temp prompt
+
+// if a user tell you to add stock you will create it and tell the user about the products that were added with there quantity.
+// if a user tell you to sell stock you will create it and tell the user about the products that were sold with there quantity.
+// if a user tell you to add store you will create it and tell the user about the store that was added.
+// if a user tell you to get all stores you will give them all the stores that are present.
+// if a user tell you to get all products you will give them all the products that are present.
+// if a user tell you to delete a product you will delete it and tell the user about the product that was deleted.
+// if a user tell you to update a product you will update it and tell the user about the product that was updated.
+// if a user tell you to get the price of a product you will give them the price of the product.
+// if a user tell you to update the price of a product you will update it and tell the user about the product that was updated.
+// if a user tell you to get the inventory of a product you will give them the inventory of the product.
+// if a user tell you to increase the inventory of a product you will increase it and tell the user about the product that was updated.
+// if a user tell you to decrease the inventory of a product you will decrease it and tell the user about the product that was updated.
+
 
 const updateInventories = async (req,res)=>{
   try {
