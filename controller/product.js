@@ -155,10 +155,12 @@ const updateSelectedProduct = async (req, res) => {
 
       const updatedResult = await Product.findOneAndUpdate(
         { $text: { $search: productName } },
-        { score: { $meta: "textScore" } }
-      ).sort({ score: { $meta: "textScore" } },
         updateFields,
-        { new: true }
+        {
+          new: true,
+          sort: { score: { $meta: "textScore" } },
+          projection: { score: { $meta: "textScore" } }
+        }
       );
       console.log("updatedResult", updatedResult);
       return updatedResult; // Return result if in LLM mode
