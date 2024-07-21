@@ -57,7 +57,9 @@ const getTotalSalesAmount = async (req, res) => {
       let totalSaleAmount = 0;
       const salesData = await Sales.find({ userID: req?.params?.userID });
       salesData.forEach((sale) => {
-        totalSaleAmount += sale.TotalSaleAmount;
+        sale.soldProducts.forEach((product) => {
+          totalSaleAmount += product.totalSaleAmount;
+        });
       });
 
       return { totalSaleAmount }; // Return data if in LLM mode
@@ -72,7 +74,9 @@ const getTotalSalesAmount = async (req, res) => {
     let totalSaleAmount = 0;
     const salesData = await Sales.find({ userID: req?.params?.userID });
     salesData.forEach((sale) => {
-      totalSaleAmount += sale.TotalSaleAmount;
+      sale.soldProducts.forEach((product) => {
+        totalSaleAmount += product.totalSaleAmount;
+      });
     });
 
     res.status(200).json({ totalSaleAmount });
@@ -82,6 +86,7 @@ const getTotalSalesAmount = async (req, res) => {
       .send(`Error calculating total sales amount: ${err.message}`);
   }
 };
+
 const addSales = async (req, res) => {
   const { userID, products, storeName, saleDate } = req.body;
   console.log("products", JSON.stringify(products));
