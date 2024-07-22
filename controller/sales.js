@@ -7,49 +7,62 @@ const Store = require("../models/store");
 const generateDynamicPattern = require("../util/generateDynamicPattern");
 
 const getMonthlySales = async (req, res) => {
+  const currentDate = new Date();
+  const startDate = new Date();
+  startDate.setDate(currentDate.getDate() - 6); // Start date is 6 days before current date
+
   if (req?.LLM === true) {
     try {
-      const sales = await Sales.find();
+      const sales = await Sales.find({
+        saleDate: {
+          $gte: startDate,
+          $lt: currentDate,
+        },
+      });
 
-      // Initialize array with 12 zeros
-      const salesAmount = [];
-      salesAmount.length = 12;
-      salesAmount.fill(0);
+      const salesAmount = Array(7).fill(0); // Initialize array for 7 days
 
-      // sales.forEach((sale) => {
-      //   const monthIndex = parseInt(sale?.SaleDate.split("-")[1]) - 1;
-      //   salesAmount[monthIndex] += sale?.TotalSaleAmount;
-      // });
+      sales.forEach((sale) => {
+        const dayIndex = Math.floor((new Date(sale.saleDate) - startDate) / (1000 * 60 * 60 * 24));
+        sale.soldProducts.forEach((product) => {
+          salesAmount[dayIndex] += product.totalSaleAmount;
+        });
+      });
 
-      return { salesAmount }; // Return data if in LLM mode
+      return salesAmount; // Return array if in LLM mode
     } catch (err) {
       console.error(err);
-      return `Error fetching monthly sales: ${err.message}`; // Return error message if in LLM mode
+      return `Error fetching daily sales: ${err.message}`; // Return error message if in LLM mode
     }
   }
 
   // Standard API mode
   try {
-    const sales = await Sales.find();
+    const sales = await Sales.find({
+      saleDate: {
+        $gte: startDate,
+        $lt: currentDate,
+      },
+    });
 
-    // Initialize array with 12 zeros
-    const salesAmount = [];
-    salesAmount.length = 12;
-    salesAmount.fill(0);
+    const salesAmount = Array(7).fill(0); // Initialize array for 7 days
 
-    // sales.forEach((sale) => {
-    //   const monthIndex = parseInt(sale?.SaleDate.split("-")[1]) - 1;
-    //   salesAmount[monthIndex] += sale?.TotalSaleAmount;
-    // });
+    sales.forEach((sale) => {
+      const dayIndex = Math.floor((new Date(sale.saleDate) - startDate) / (1000 * 60 * 60 * 24));
+      sale.soldProducts.forEach((product) => {
+        salesAmount[dayIndex] += product.totalSaleAmount;
+      });
+    });
 
-    res.status(200).json({ salesAmount });
+    res.status(200).json(salesAmount);
   } catch (err) {
     console.error(err);
     res
       .status(500)
-      .json({ error: `Error fetching monthly sales: ${err.message}` });
+      .json({ error: `Error fetching daily sales: ${err.message}` });
   }
 };
+
 
 const getTotalSalesAmount = async (req, res) => {
   if (req?.LLM === true) {
@@ -75,10 +88,11 @@ const getTotalSalesAmount = async (req, res) => {
     const salesData = await Sales.find({ userID: req?.params?.userID });
     salesData.forEach((sale) => {
       sale.soldProducts.forEach((product) => {
+        console.log('product',product)
         totalSaleAmount += product.totalSaleAmount;
       });
     });
-
+    console.log("salesData",salesData)
     res.status(200).json({ totalSaleAmount });
   } catch (err) {
     res
