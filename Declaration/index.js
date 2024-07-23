@@ -6,7 +6,7 @@ const addPurchaseFunctionDeclaration = {
     properties: {
       userID: {
         type: "string",
-        description: "Unique identifier for the user making the purchase"
+        description: "Unique identifier for the user making the purchase",
       },
       purchasedProducts: {
         type: "array",
@@ -16,19 +16,19 @@ const addPurchaseFunctionDeclaration = {
           properties: {
             productName: {
               type: "string",
-              description: "Name of the purchased product in English"
+              description: "Name of the purchased product in English",
             },
             quantityPurchased: {
               type: "number",
-              description: "Quantity of the product purchased"
-            }
+              description: "Quantity of the product purchased",
+            },
           },
-          required: ["productName", "quantityPurchased"]
-        }
-      }
+          required: ["productName", "quantityPurchased"],
+        },
+      },
     },
-    required: ["userID", "purchasedProducts"]
-  }
+    required: ["userID", "purchasedProducts"],
+  },
 };
 
 const getPurchaseDataFunctionDeclaration = {
@@ -39,56 +39,63 @@ const getPurchaseDataFunctionDeclaration = {
     properties: {
       userID: {
         type: "string",
-        description: "Unique identifier for the user whose purchase data is to be retrieved"
-      }
+        description:
+          "Unique identifier for the user whose purchase data is to be retrieved",
+      },
     },
-    required: ["userID"]
-  }
+    required: ["userID"],
+  },
 };
 
 const getTotalPurchaseAmountFunctionDeclaration = {
   name: "getTotalPurchaseAmount",
-  description: "Calculate the total amount spent on purchases by a specific user",
+  description:
+    "Calculate the total amount spent on purchases by a specific user",
   parameters: {
     type: "object",
     properties: {
       userID: {
         type: "string",
-        description: "Unique identifier for the user whose total purchase amount is to be calculated"
-      }
+        description:
+          "Unique identifier for the user whose total purchase amount is to be calculated",
+      },
     },
-    required: ["userID"]
-  }
+    required: ["userID"],
+  },
 };
 
 const purchaseStockFunctionDeclaration = {
   name: "purchaseStock",
-  description: "Update the stock level of a specific product based on purchased stock",
+  description:
+    "Update the stock level of a specific product based on purchased stock",
   parameters: {
     type: "object",
     properties: {
       productID: {
         type: "string",
-        description: "Unique identifier for the product whose stock is being updated"
+        description:
+          "Unique identifier for the product whose stock is being updated",
       },
       purchaseStockData: {
         type: "number",
-        description: "Amount of stock to be added to the product's current stock"
-      }
+        description:
+          "Amount of stock to be added to the product's current stock",
+      },
     },
-    required: ["productID", "purchaseStockData"]
-  }
+    required: ["productID", "purchaseStockData"],
+  },
 };
 
 const addSalesFunctionDeclaration = {
   name: "addSales",
-  description: "Add a new sales record and update the stock sold for multiple products using the given store name and product names",
+  description:
+    "Add a new sales record and update the stock sold for multiple products using the given store name and product names",
   parameters: {
     type: "object",
     properties: {
       userID: {
         type: "string",
-        description: "Unique identifier for the user making the sale"
+        description: "Unique identifier for the user making the sale",
       },
       products: {
         type: "array",
@@ -98,23 +105,23 @@ const addSalesFunctionDeclaration = {
           properties: {
             productName: {
               type: "string",
-              description: "English name for the product being sold"
+              description: "English name for the product being sold",
             },
             stockSold: {
               type: "number",
-              description: "Quantity of the product sold"
-            }
+              description: "Quantity of the product sold",
+            },
           },
-          required: ["productName", "stockSold"]
-        }
+          required: ["productName", "stockSold"],
+        },
       },
       storeName: {
         type: "string",
-        description: "Name of the store where the sale occurred"
-      }
+        description: "Name of the store where the sale occurred",
+      },
     },
-    required: ["userID", "products", "storeName"]
-  }
+    required: ["userID", "products", "storeName"],
+  },
 };
 
 const getSalesDataFunctionDeclaration = {
@@ -125,11 +132,12 @@ const getSalesDataFunctionDeclaration = {
     properties: {
       userID: {
         type: "string",
-        description: "Unique identifier for the user whose sales data is to be retrieved"
-      }
+        description:
+          "Unique identifier for the user whose sales data is to be retrieved",
+      },
     },
-    required: ["userID"]
-  }
+    required: ["userID"],
+  },
 };
 
 const getTotalSalesAmountFunctionDeclaration = {
@@ -140,30 +148,34 @@ const getTotalSalesAmountFunctionDeclaration = {
     properties: {
       userID: {
         type: "string",
-        description: "Unique identifier for the user whose total sales amount is to be calculated"
-      }
+        description:
+          "Unique identifier for the user whose total sales amount is to be calculated",
+      },
     },
-    required: ["userID"]
-  }
+    required: ["userID"],
+  },
 };
 
 const soldStockFunctionDeclaration = {
   name: "soldStock",
-  description: "Update the stock level of a specific product based on the amount of stock sold",
+  description:
+    "Update the stock level of a specific product based on the amount of stock sold",
   parameters: {
     type: "object",
     properties: {
       productID: {
         type: "string",
-        description: "Unique identifier for the product whose stock is being updated"
+        description:
+          "Unique identifier for the product whose stock is being updated",
       },
       stockSoldData: {
         type: "number",
-        description: "Amount of stock that has been sold and should be deducted from the current stock"
-      }
+        description:
+          "Amount of stock that has been sold and should be deducted from the current stock",
+      },
     },
-    required: ["productID", "stockSoldData"]
-  }
+    required: ["productID", "stockSoldData"],
+  },
 };
 
 const addStoreFunctionDeclaration = {
@@ -174,31 +186,31 @@ const addStoreFunctionDeclaration = {
     properties: {
       userID: {
         type: "string",
-        description: "Unique identifier for the user creating the store"
+        description: "Unique identifier for the user creating the store",
       },
       name: {
         type: "string",
-        description: "Name of the store"
+        description: "Name of the store",
       },
       category: {
         type: "string",
-        description: "Category of the store (e.g., grocery, electronics)"
+        description: "Category of the store (e.g., grocery, electronics)",
       },
       address: {
         type: "string",
-        description: "Address of the store"
+        description: "Address of the store",
       },
       city: {
         type: "string",
-        description: "City where the store is located"
+        description: "City where the store is located",
       },
       image: {
         type: "string",
-        description: "URL or path to the store's image"
-      }
+        description: "URL or path to the store's image",
+      },
     },
-    required: ["userID", "name", "category", "address", "city"]
-  }
+    required: ["userID", "name", "category", "address", "city"],
+  },
 };
 
 const getAllStoresFunctionDeclaration = {
@@ -209,11 +221,12 @@ const getAllStoresFunctionDeclaration = {
     properties: {
       userID: {
         type: "string",
-        description: "Unique identifier for the user whose stores are to be retrieved"
-      }
+        description:
+          "Unique identifier for the user whose stores are to be retrieved",
+      },
     },
-    required: ["userID"]
-  }
+    required: ["userID"],
+  },
 };
 
 const addProductFunctionDeclaration = {
@@ -224,31 +237,32 @@ const addProductFunctionDeclaration = {
     properties: {
       userId: {
         type: "string",
-        description: "Unique identifier for the user adding the product"
+        description: "Unique identifier for the user adding the product",
       },
       name: {
         type: "string",
-        description: "Name of the product in English and always taken as singular"
+        description:
+          "Name of the product in English and always taken as singular",
       },
       manufacturer: {
         type: "string",
-        description: "Manufacturer of the product"
+        description: "Manufacturer of the product",
       },
       stock: {
         type: "number",
-        description: "Quantity of stock available for the product"
+        description: "Quantity of stock available for the product",
       },
       description: {
         type: "string",
-        description: "Description of the product written in user-given English"
+        description: "Description of the product written in user-given English",
       },
       price: {
         type: "number",
-        description: "Price of the product"
-      }
+        description: "Price of the product",
+      },
     },
-    required: ["userId", "name", "manufacturer", "stock", "price"]
-  }
+    required: ["userId", "name", "manufacturer", "stock", "price"],
+  },
 };
 
 const getAllProductsFunctionDeclaration = {
@@ -259,11 +273,12 @@ const getAllProductsFunctionDeclaration = {
     properties: {
       userID: {
         type: "string",
-        description: "Unique identifier for the user whose products are to be retrieved"
-      }
+        description:
+          "Unique identifier for the user whose products are to be retrieved",
+      },
     },
-    required: ["userID"]
-  }
+    required: ["userID"],
+  },
 };
 
 const deleteSelectedProductFunctionDeclaration = {
@@ -274,11 +289,11 @@ const deleteSelectedProductFunctionDeclaration = {
     properties: {
       name: {
         type: "string",
-        description: "Name of the product to be deleted in English"
-      }
+        description: "Name of the product to be deleted in English",
+      },
     },
-    required: ["name"]
-  }
+    required: ["name"],
+  },
 };
 
 const updateSelectedProductFunctionDeclaration = {
@@ -289,31 +304,32 @@ const updateSelectedProductFunctionDeclaration = {
     properties: {
       newName: {
         type: "string",
-        description: "Updated name of the product"
+        description: "Updated name of the product",
       },
       name: {
         type: "string",
-        description: "Name of the product in English"
+        description: "Name of the product in English",
       },
       manufacturer: {
         type: "string",
-        description: "Updated manufacturer of the product"
+        description: "Updated manufacturer of the product",
       },
       description: {
         type: "string",
-        description: "Updated description of the product in the same language as provided by the user"
+        description:
+          "Updated description of the product in the same language as provided by the user",
       },
       price: {
         type: "number",
-        description: "Updated price of the product"
+        description: "Updated price of the product",
       },
       stock: {
         type: "number",
-        description: "Updated stock quantity of the product"
-      }
+        description: "Updated stock quantity of the product",
+      },
     },
-    required: ["name"]
-  }
+    required: ["name"],
+  },
 };
 
 const getProductByNameFunctionDeclaration = {
@@ -324,11 +340,27 @@ const getProductByNameFunctionDeclaration = {
     properties: {
       name: {
         type: "string",
-        description: "Name of the product in English"
-      }
+        description: "Name of the product in English",
+      },
     },
-    required: ["name"]
-  }
+    required: ["name"],
+  },
+};
+
+const ErrorResponseFunctionDeclaration = {
+  name: "ErrorResponse",
+  description:
+    "use this fucntion if you can not find any related fucntion to users request",
+  parameters: {
+    type: "object",
+    properties: {
+      userId: {
+        type: "string",
+        description: "id of the user",
+      },
+    },
+    required: ["userId"],
+  },
 };
 
 module.exports = {
@@ -346,5 +378,6 @@ module.exports = {
   getAllProductsFunctionDeclaration,
   deleteSelectedProductFunctionDeclaration,
   updateSelectedProductFunctionDeclaration,
-  getProductByNameFunctionDeclaration
+  getProductByNameFunctionDeclaration,
+  ErrorResponseFunctionDeclaration,
 };

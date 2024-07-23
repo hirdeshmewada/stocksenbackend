@@ -1,31 +1,57 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 // const { decrementCounter } = require("../services/decrementCounter");
 // const { incrementCounter } = require("../services/incrementCounter");
-// const { getCurrentProductNumber } = require("../services/getProductNumber"); 
-const { increaseInventory, decreaseInventory, getInventory,createProduct,updateProductPrice, getProductPrice } = require("../services/inventoryManagement");
+// const { getCurrentProductNumber } = require("../services/getProductNumber");
 const {
-    addPurchaseFunctionDeclaration,
-    getPurchaseDataFunctionDeclaration,
-    getTotalPurchaseAmountFunctionDeclaration,
-    purchaseStockFunctionDeclaration,
-    addSalesFunctionDeclaration,
-    getSalesDataFunctionDeclaration,
-    getTotalSalesAmountFunctionDeclaration,
-    soldStockFunctionDeclaration,
-    addStoreFunctionDeclaration,
-    getAllStoresFunctionDeclaration,
-    addProductFunctionDeclaration,
-    getAllProductsFunctionDeclaration,
-    deleteSelectedProductFunctionDeclaration,
-    updateSelectedProductFunctionDeclaration,
-    getProductByNameFunctionDeclaration} = require("../Declaration")
-const { updateMultipleInventories } = require("../services/updateMultipleInventories");
-const { addPurchase, getPurchaseData, getTotalPurchaseAmount } = require("./purchase");
+  increaseInventory,
+  decreaseInventory,
+  getInventory,
+  createProduct,
+  updateProductPrice,
+  getProductPrice,
+} = require("../services/inventoryManagement");
+const {
+  addPurchaseFunctionDeclaration,
+  getPurchaseDataFunctionDeclaration,
+  getTotalPurchaseAmountFunctionDeclaration,
+  purchaseStockFunctionDeclaration,
+  addSalesFunctionDeclaration,
+  getSalesDataFunctionDeclaration,
+  getTotalSalesAmountFunctionDeclaration,
+  soldStockFunctionDeclaration,
+  addStoreFunctionDeclaration,
+  getAllStoresFunctionDeclaration,
+  addProductFunctionDeclaration,
+  getAllProductsFunctionDeclaration,
+  deleteSelectedProductFunctionDeclaration,
+  updateSelectedProductFunctionDeclaration,
+  getProductByNameFunctionDeclaration,
+  ErrorResponseFunctionDeclaration,
+} = require("../Declaration");
+const {
+  updateMultipleInventories,
+} = require("../services/updateMultipleInventories");
+const {
+  addPurchase,
+  getPurchaseData,
+  getTotalPurchaseAmount,
+} = require("./purchase");
 const purchaseStock = require("./purchaseStock");
-const { addSales, getSalesData, getTotalSalesAmount, getMonthlySales } = require("./sales");
+const {
+  addSales,
+  getSalesData,
+  getTotalSalesAmount,
+  getMonthlySales,
+} = require("./sales");
 const soldStock = require("./soldStock");
 const { addStore, getAllStores } = require("./store");
-const { getProductByName, addProduct, getAllProducts, deleteSelectedProduct, updateSelectedProduct } = require("./product");
+const {
+  getProductByName,
+  addProduct,
+  getAllProducts,
+  deleteSelectedProduct,
+  updateSelectedProduct,
+} = require("./product");
 require("dotenv").config();
 
 const genAI = new GoogleGenerativeAI(process.env.API_KEY);
@@ -175,110 +201,118 @@ const genAI = new GoogleGenerativeAI(process.env.API_KEY);
 // };
 
 const functions = {
-    addProduct: async (req,res) => {
-      console.log("addProduct");
-      return addProduct(req,res);
-    },
-    
-    getAllProducts: async ({ userID }) => {
-      console.log("getAllProducts");
-      return getAllProducts({ userID });
-    },
-    
-    deleteSelectedProduct: async (req,res) => {
-      console.log("deleteSelectedProduct");
-      return deleteSelectedProduct(req,res);
-    },
-    
-    updateSelectedProduct: async (req,res) => {
-      console.log("updateSelectedProduct");
-      return updateSelectedProduct(req,res);
-    },
+  addProduct: async (req, res) => {
+    console.log("addProduct");
+    return addProduct(req, res);
+  },
 
-    addPurchase: async (req,res) => {
-      console.log("addPurchase");
-      return addPurchase(req,res);
-    },
-    
-    getPurchaseData: async (req,res) => {
-      console.log("getPurchaseData");
-      return getPurchaseData(req,res);
-    },
-    
-    getTotalPurchaseAmount: async (req,res) => {
-      console.log("getTotalPurchaseAmount");
-      return getTotalPurchaseAmount(req,res);
-    },
-    
-    purchaseStock: async (req,res) => {
-      console.log("purchaseStock");
-      return purchaseStock(req,res);
-    },
-    
+  getAllProducts: async ({ userID }) => {
+    console.log("getAllProducts");
+    return getAllProducts({ userID });
+  },
 
-    
-    addSales: async (req,res) => {
-      console.log("addSales");
-      return addSales(req,res);
-    },
-    
-    // getSalesData: async (req,res) => {
-    //   console.log("getSalesData");
-    //   return getSalesData(req,res);
-    // },
-    
-    // getTotalSalesAmount: async (req,res) => {
-    //   console.log("getTotalSalesAmount");
-    //   return getTotalSalesAmount(req,res);
-    // },
+  deleteSelectedProduct: async (req, res) => {
+    console.log("deleteSelectedProduct");
+    return deleteSelectedProduct(req, res);
+  },
 
-    
-    // soldStock: async (req,res) => {
-    //   console.log("soldStock");
-    //   return soldStock(req,res);
-    // },
-    
-    // addStore: async (req,res) => {
-    //   console.log("addStore");
-    //   return addStore(req,res);
-    // },
-    
-    // getAllStores: async (req,res) => {
-    //   console.log("getAllStores");
-    //   return getAllStores(req,res);
-    // },
-    getProductByName: async (req,res) => {
-      console.log("getProductByName");
-      return getProductByName(req,res);
-    },
+  updateSelectedProduct: async (req, res) => {
+    console.log("updateSelectedProduct");
+    return updateSelectedProduct(req, res);
+  },
+
+  addPurchase: async (req, res) => {
+    console.log("addPurchase");
+    return addPurchase(req, res);
+  },
+
+  getPurchaseData: async (req, res) => {
+    console.log("getPurchaseData");
+    return getPurchaseData(req, res);
+  },
+
+  getTotalPurchaseAmount: async (req, res) => {
+    console.log("getTotalPurchaseAmount");
+    return getTotalPurchaseAmount(req, res);
+  },
+
+  purchaseStock: async (req, res) => {
+    console.log("purchaseStock");
+    return purchaseStock(req, res);
+  },
+
+  addSales: async (req, res) => {
+    console.log("addSales");
+    return addSales(req, res);
+  },
+
+  // getSalesData: async (req,res) => {
+  //   console.log("getSalesData");
+  //   return getSalesData(req,res);
+  // },
+
+  // getTotalSalesAmount: async (req,res) => {
+  //   console.log("getTotalSalesAmount");
+  //   return getTotalSalesAmount(req,res);
+  // },
+
+  // soldStock: async (req,res) => {
+  //   console.log("soldStock");
+  //   return soldStock(req,res);
+  // },
+
+  // addStore: async (req,res) => {
+  //   console.log("addStore");
+  //   return addStore(req,res);
+  // },
+
+  // getAllStores: async (req,res) => {
+  //   console.log("getAllStores");
+  //   return getAllStores(req,res);
+  // },
+  getProductByName: async (req, res) => {
+    console.log("getProductByName");
+    return getProductByName(req, res);
+  },
+  ErrorResponse: async (req, res) => {
+    console.log("error response");
+
+    const ErrorResponse = (req, res) => {
+      return {
+        succes: true,
+        data: "Sorry i can not full fill these types of request",
+      };
+    };
+    return ErrorResponse(req, res);
+  },
+};
+const ErrorResponse = (req, res) => {
+  console.log("error happend");
+  return {
+    succes: true,
+    data: "Sorry i can not full fill these types of request",
   };
-
-  
-  
-
-  
-
-
-
+};
 const generativeModel = genAI.getGenerativeModel({
   model: "gemini-1.0-pro",
   tools: {
     functionDeclarations: [
       addPurchaseFunctionDeclaration,
-      getPurchaseDataFunctionDeclaration,
-      getTotalPurchaseAmountFunctionDeclaration,
-      purchaseStockFunctionDeclaration,
+      addProductFunctionDeclaration,
       addSalesFunctionDeclaration,
-      getSalesDataFunctionDeclaration,
-      getTotalSalesAmountFunctionDeclaration,
-      soldStockFunctionDeclaration,
+      updateSelectedProductFunctionDeclaration,
+      getProductByNameFunctionDeclaration,
+      ErrorResponseFunctionDeclaration,
+      // getPurchaseDataFunctionDeclaration,
+      // getTotalPurchaseAmountFunctionDeclaration,
+      // purchaseStockFunctionDeclaration,
+      // getSalesDataFunctionDeclaration,
+      // getTotalSalesAmountFunctionDeclaration,
+      // soldStockFunctionDeclaration,
       // addStoreFunctionDeclaration,
       // getAllStoresFunctionDeclaration,
-      addProductFunctionDeclaration,
-      getAllProductsFunctionDeclaration,
-      deleteSelectedProductFunctionDeclaration,
-      updateSelectedProductFunctionDeclaration,
-      getProductByNameFunctionDeclaration
+      // getAllProductsFunctionDeclaration,
+      // deleteSelectedProductFunctionDeclaration,
     ],
   },
 });
@@ -291,33 +325,54 @@ const handleGeminiRequest = async (req, res) => {
     }
     const chat = generativeModel.startChat();
     const result = await chat.sendMessage(query);
-    console.log("query",query)
-    const call = result.response.functionCalls()[0];
-    console.log(call.args, "here is whole call", call)
-    req.params = call.args
-    req.body = call.args
-    req.LLM=true
-    if (call) {
-      const apiResponse = await functions[call.name](req,res);
+    console.log("query:", query);
+    let call = "";
+    console.log(
+      "result?.response",
+      JSON.stringify(result?.response),
+      "=------=",
+      result?.response
+    );
+    try {
+      call = result?.response?.functionCalls()[0];
+    } catch (error) {}
+
+    let Error = "Sorry i can not full fill these types of request";
+    console.log(call?.args, "here is whole call", call);
+    req.params = call?.args;
+    req.body = call?.args;
+    req.LLM = true;
+    if (!call) {
+      console.log("no calls");
       const result2 = await chat.sendMessage(
-        
+        `you are a polite assistant who will tell the error below in a pro way
+        '''
+        ${Error}
+        '''
+     `
+      );
+      console.log(result2);
+      res.status(200).json({ message: result2.response.text() });
+    }
+    if (call) {
+      const apiResponse = await functions[call.name](req, res);
+      console.log(call?.name);
+      const result2 = await chat.sendMessage(
         [
-        {
-          functionResponse: {
-            name: call.name,
-            response: apiResponse,
+          {
+            functionResponse: {
+              name: call?.name || ErrorResponse(),
+              response: apiResponse,
+            },
           },
-        },
-      ],
-     `you are a polite assistant who reads the task needed to be done and complete them.
+        ],
+        `you are a polite assistant who reads the task needed to be done and complete them.
      if user tell any things related to create a product you give them the basic product information that is created.
      if a user tell you to add sales you will create it and tell the user about the products that were added with there quantity.
      if a user tell you to add purchase you will create it and tell the user about the products that were added with there quantity.
      `
-    );
+      );
       res.status(200).json({ message: result2.response.text() });
-    } else {
-      res.status(200).json({ message: result.response.text() });
     }
   } catch (error) {
     res.status(500).json({ error: error });
@@ -339,20 +394,18 @@ const handleGeminiRequest = async (req, res) => {
 // if a user tell you to increase the inventory of a product you will increase it and tell the user about the product that was updated.
 // if a user tell you to decrease the inventory of a product you will decrease it and tell the user about the product that was updated.
 
-
-const updateInventories = async (req,res)=>{
+const updateInventories = async (req, res) => {
   try {
     const { data } = req.body;
     // console.log("reacttime data", typeof JSON.stringify(data), JSON.parse(JSON.stringify(data)) )
-    const result = await updateMultipleInventories(data)
-    if(result.success==true){
+    const result = await updateMultipleInventories(data);
+    if (result.success == true) {
       res.status(200).json({ message: "done" });
-    }else{
+    } else {
       res.status(200).json({ message: "error" });
-
     }
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
-module.exports = { handleGeminiRequest,updateInventories };
+};
+module.exports = { handleGeminiRequest, updateInventories };
