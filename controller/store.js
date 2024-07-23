@@ -5,25 +5,30 @@ const addStore = async (req, res) => {
   if (req?.LLM === true) {
     try {
       const addStore = new Store({
-        userID: req?.body?.userId, 
+        userID: req?.body?.userId,
         name: req?.body?.name,
         category: req?.body?.category,
         address: req?.body?.address,
         city: req?.body?.city,
-        image: req?.body?.image || "https://images.pexels.com/photos/19158948/pexels-photo-19158948/free-photo-of-indian-flag-on-a-pole.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+        image:
+          req?.body?.image ||
+          "https://images.pexels.com/photos/19158948/pexels-photo-19158948/free-photo-of-indian-flag-on-a-pole.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
       });
       const savedStore = await addStore.save();
+      if (!savedStore) {
+        return { succes: true, data: "can not create Store, please try again" };
+      }
       return savedStore; // Return the result for LLM mode
     } catch (error) {
       console.error("Error adding store: ", error);
-      return `Error adding store: ${error.message}`; // Return the error message for LLM mode
+      return { succes: true, data: "can not create Store, please try again" };
     }
   }
 
   // Standard API Mode
   try {
     const addStore = new Store({
-      userID: req?.body?.userId, 
+      userID: req?.body?.userId,
       name: req?.body?.name,
       category: req?.body?.category,
       address: req?.body?.address,
@@ -73,7 +78,8 @@ const editStore = async (req, res) => {
       const updatedStore = await Store.findOneAndUpdate(
         { $text: { $search: req?.body?.name } },
         { score: { $meta: "textScore" } }
-      ).sort({ score: { $meta: "textScore" } },
+      ).sort(
+        { score: { $meta: "textScore" } },
         { name, category, address, city, image },
         { new: true } // Return the updated document
       );

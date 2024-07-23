@@ -52,19 +52,23 @@ const getProductByName = async (req, res) => {
     if (req.LLM === true) {
       // const productName = generateDynamicPattern(req?.params?.name)
 
-      const productName = req?.params?.name;
+      try {
+        const productName = req?.params?.name;
 
-      console.log(productName);
-      const product = await Product.findOne(
-        { $text: { $search: productName } },
-        { score: { $meta: "textScore" } }
-      ).sort({ score: { $meta: "textScore" } });
+        console.log(productName);
+        const product = await Product.findOne(
+          { $text: { $search: productName } },
+          { score: { $meta: "textScore" } }
+        ).sort({ score: { $meta: "textScore" } });
 
-      console.log(product);
-      if (!product) {
-        return "Product not found"; // Return message if in LLM mode
+        console.log(product);
+        if (!product) {
+          return { succes: true, data: "Product not found" }; // Return message if in LLM mode
+        }
+        return product; // Return product if in LLM mode
+      } catch (error) {
+        return { succes: true, data: "Product not found" }; // Return message if in LLM mode
       }
-      return product; // Return product if in LLM mode
     }
 
     // Normal mode
@@ -106,13 +110,17 @@ const deleteSelectedProduct = async (req, res) => {
     if (req.LLM === true) {
       const productName = generateDynamicPattern(req?.params?.name);
 
-      const deleteProduct = await Product.deleteOne(  { $text: { $search: productName } },
+      const deleteProduct = await Product.deleteOne(
+        { $text: { $search: productName } },
         { score: { $meta: "textScore" } }
       ).sort({ score: { $meta: "textScore" } });
       console.log("req.LLM", req.LLM, "deleteProduct", deleteProduct);
       // const deletePurchaseProduct = await Purchase.deleteOne({ ProductID: req?.params?.id });
       // const deleteSaleProduct = await Sales.deleteOne({ ProductID: req?.params?.id });
-      return { deleteProduct }; // Return result if in LLM mode
+      if (deleteProduct) {
+        return { deleteProduct }; // Return result if in LLM mode
+      }
+      return { succes: true, data: "cant find the product" };
     }
 
     // Normal mode
@@ -151,19 +159,26 @@ const updateSelectedProduct = async (req, res) => {
 
     // Check if LLM mode is enabled
     if (req.LLM === true) {
-      const productName = req?.params?.name
+      try {
+        const productName = req?.params?.name;
 
-      const updatedResult = await Product.findOneAndUpdate(
-        { $text: { $search: productName } },
-        updateFields,
-        {
-          new: true,
-          sort: { score: { $meta: "textScore" } },
-          projection: { score: { $meta: "textScore" } }
+        const updatedResult = await Product.findOneAndUpdate(
+          { $text: { $search: productName } },
+          updateFields,
+          {
+            new: true,
+            sort: { score: { $meta: "textScore" } },
+            projection: { score: { $meta: "textScore" } },
+          }
+        );
+        console.log("updatedResult", updatedResult);
+        if (updatedResult) {
+          return updatedResult; // Return result if in LLM mode
         }
-      );
-      console.log("updatedResult", updatedResult);
-      return updatedResult; // Return result if in LLM mode
+        return { succes: true, data: "cant update the product" };
+      } catch (error) {
+        return { succes: true, data: "cant update the product" };
+      }
     }
 
     // Normal mode
@@ -175,7 +190,7 @@ const updateSelectedProduct = async (req, res) => {
     res.json(updatedResult);
   } catch (error) {
     // console.error("Error updating selected product: ", error);
-    console.log(error)
+    console.log(error);
     res.status(500).send("Server error");
   }
 };

@@ -23,7 +23,9 @@ const getMonthlySales = async (req, res) => {
       const salesAmount = Array(7).fill(0); // Initialize array for 7 days
 
       sales.forEach((sale) => {
-        const dayIndex = Math.floor((new Date(sale.saleDate) - startDate) / (1000 * 60 * 60 * 24));
+        const dayIndex = Math.floor(
+          (new Date(sale.saleDate) - startDate) / (1000 * 60 * 60 * 24)
+        );
         sale.soldProducts.forEach((product) => {
           salesAmount[dayIndex] += product.totalSaleAmount;
         });
@@ -48,7 +50,9 @@ const getMonthlySales = async (req, res) => {
     const salesAmount = Array(7).fill(0); // Initialize array for 7 days
 
     sales.forEach((sale) => {
-      const dayIndex = Math.floor((new Date(sale.saleDate) - startDate) / (1000 * 60 * 60 * 24));
+      const dayIndex = Math.floor(
+        (new Date(sale.saleDate) - startDate) / (1000 * 60 * 60 * 24)
+      );
       sale.soldProducts.forEach((product) => {
         salesAmount[dayIndex] += product.totalSaleAmount;
       });
@@ -62,7 +66,6 @@ const getMonthlySales = async (req, res) => {
       .json({ error: `Error fetching daily sales: ${err.message}` });
   }
 };
-
 
 const getTotalSalesAmount = async (req, res) => {
   if (req?.LLM === true) {
@@ -88,11 +91,11 @@ const getTotalSalesAmount = async (req, res) => {
     const salesData = await Sales.find({ userID: req?.params?.userID });
     salesData.forEach((sale) => {
       sale.soldProducts.forEach((product) => {
-        console.log('product',product)
+        console.log("product", product);
         totalSaleAmount += product.totalSaleAmount;
       });
     });
-    console.log("salesData",salesData)
+    console.log("salesData", salesData);
     res.status(200).json({ totalSaleAmount });
   } catch (err) {
     res
@@ -115,12 +118,17 @@ const addSales = async (req, res) => {
 
       for (const product of products) {
         const { productName, stockSold } = product;
-        const myProductData = await Product.findOne( { $text: { $search: productName } },
+        const myProductData = await Product.findOne(
+          { $text: { $search: productName } },
           { score: { $meta: "textScore" } }
-        ).sort({ score: { $meta: "textScore" } }).session(session);
+        )
+          .sort({ score: { $meta: "textScore" } })
+          .session(session);
         console.log(myProductData);
         if (!myProductData) {
-          throw new Error("Product not found");
+          return { succes: true, data: "Product not found" };
+
+          // throw new Error("Product not found");
         }
 
         myProductData.stock =
@@ -136,11 +144,13 @@ const addSales = async (req, res) => {
         await myProductData.save({ session });
       }
 
-      const storeID = await Store.findOne( { $text: { $search: storeName } },
+      const storeID = await Store.findOne(
+        { $text: { $search: storeName } },
         { score: { $meta: "textScore" } }
       ).sort({ score: { $meta: "textScore" } });
       if (!storeID) {
-        return "store dont exit";
+        return { succes: true, data: "Store not found" };
+        // throw new Error("store dont exit");
       }
       const addSalesDetails = new Sales({
         userID,
@@ -153,13 +163,24 @@ const addSales = async (req, res) => {
       const savedSales = await addSalesDetails.save({ session });
       await session.commitTransaction();
       session.endSession();
+      if (!savedSales) {
+        return {
+          succes: true,
+          data: "Sorry, can not create sales for this product. please try another",
+        };
+
+        // throw new Error("store dont exit");
+      }
 
       return savedSales;
     } catch (error) {
       await session.abortTransaction();
       session.endSession();
       console.log(error);
-      return error.message;
+      return {
+        succes: true,
+        data: "Sorry, can not create sales for this product. please try another",
+      };
     }
   } else {
     // Logic when LLM is false
@@ -193,7 +214,7 @@ const addSales = async (req, res) => {
       // if (!storeID) {
       //   return "store dont exit";
       // }
-      console.log(req.body)
+      console.log(req.body);
       const addSalesDetails = new Sales({
         userID,
         soldProducts: tempProducts,

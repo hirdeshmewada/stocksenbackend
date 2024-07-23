@@ -20,19 +20,26 @@ const addPurchase = async (req, res) => {
       // Update stock for each product in the purchase
       for (const product of purchasedProducts) {
         const { productName, quantityPurchased } = product;
-        console.log("productName, quantityPurchased", productName, quantityPurchased);
+        console.log(
+          "productName, quantityPurchased",
+          productName,
+          quantityPurchased
+        );
 
         const myProductData = await Product.findOne(
           { $text: { $search: productName } },
           { score: { $meta: "textScore" } }
-        ).sort({ score: { $meta: "textScore" } }).session(session);
+        )
+          .sort({ score: { $meta: "textScore" } })
+          .session(session);
 
         console.log("myProductData", myProductData);
         if (!myProductData) {
           throw new Error("Product not found");
         }
 
-        myProductData.stock = parseInt(myProductData.stock) + parseInt(quantityPurchased);
+        myProductData.stock =
+          parseInt(myProductData.stock) + parseInt(quantityPurchased);
 
         let temp = {
           productID: myProductData._id,
@@ -46,7 +53,7 @@ const addPurchase = async (req, res) => {
           updateOne: {
             filter: { _id: myProductData._id },
             update: { $set: { stock: myProductData.stock } },
-          }
+          },
         });
       }
 
@@ -63,13 +70,15 @@ const addPurchase = async (req, res) => {
       const savedPurchase = await addPurchaseDetails.save({ session });
       await session.commitTransaction();
       session.endSession();
-
-      return savedPurchase;
+      if (savedPurchase) {
+        return savedPurchase;
+      }
+      return { succes: true, data: "can not purchase the product" };
     } catch (error) {
       await session.abortTransaction();
       session.endSession();
       console.log(error);
-      return error.message; // Return error message if in LLM mode
+      return { succes: true, data: "can not purchase the product" };
     }
   }
 
