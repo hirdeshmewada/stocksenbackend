@@ -327,12 +327,6 @@ const handleGeminiRequest = async (req, res) => {
     const result = await chat.sendMessage(query);
     console.log("query:", query);
     let call = "";
-    console.log(
-      "result?.response",
-      JSON.stringify(result?.response),
-      "=------=",
-      result?.response
-    );
     try {
       call = result?.response?.functionCalls()[0];
     } catch (error) {}
@@ -344,15 +338,29 @@ const handleGeminiRequest = async (req, res) => {
     req.LLM = true;
     if (!call) {
       console.log("no calls");
-      const result2 = await chat.sendMessage(
-        `you are a polite assistant who will tell the error below in a pro way
-        '''
-        ${Error}
-        '''
-     `
-      );
-      console.log(result2);
-      res.status(200).json({ message: result2.response.text() });
+      const result2 = await chat.sendMessage(`Always respond with an answer.
+          You are a polite assistant who will professionally explain the error below.
+          '''
+          ${Error}
+          '''
+       `);
+      try {
+        let message = result2?.response?.text();
+        console.log("message", message);
+        if (message) {
+          res.status(200).json({
+            message: result2.response.text(),
+          });
+        } else {
+          res.status(200).json({
+            message: "Sorry i can not full fill these types of request",
+          });
+        }
+      } catch (error) {
+        res.status(200).json({
+          message: "Sorry i can not full fill these types of request",
+        });
+      }
     }
     if (call) {
       const apiResponse = await functions[call.name](req, res);
@@ -366,16 +374,16 @@ const handleGeminiRequest = async (req, res) => {
             },
           },
         ],
-        `you are a polite assistant who reads the task needed to be done and complete them.
-     if user tell any things related to create a product you give them the basic product information that is created.
-     if a user tell you to add sales you will create it and tell the user about the products that were added with there quantity.
-     if a user tell you to add purchase you will create it and tell the user about the products that were added with there quantity.
-     `
+        `You are a polite female assistant who reads the tasks needed to be done and completes them.
+         If the user asks to create a product, provide basic product information.
+         If the user asks to add sales, create it and tell the user about the products added with their quantity.
+         If the user asks to add purchases, create it and tell basic information about the products added with their quantity.
+       `
       );
       res.status(200).json({ message: result2.response.text() });
     }
   } catch (error) {
-    res.status(500).json({ error: error });
+    res.status(500).json({ error: "server Error please try again" });
   }
 };
 
