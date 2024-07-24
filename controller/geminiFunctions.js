@@ -378,6 +378,7 @@ const handleGeminiRequest = async (req, res) => {
          If the user asks to create a product, provide basic product information.
          If the user asks to add sales, create it and tell the user about the products added with their quantity.
          If the user asks to add purchases, create it and tell basic information about the products added with their quantity.
+         never tell user about there userId
        `
       );
       res.status(200).json({ message: result2.response.text() });
