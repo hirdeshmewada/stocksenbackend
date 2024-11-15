@@ -1,11 +1,34 @@
 const Product = require("../models/product");
 const Purchase = require("../models/purchase");
 const Sales = require("../models/sales");
+const { uploadOnCloudinary } = require("../util/cloudinary");
 const generateDynamicPattern = require("../util/generateDynamicPattern");
+const cloudinary = require('cloudinary').v2;
 
 // Add Post
 const addProduct = async (req, res) => {
   try {
+  
+    
+    if(req?.files?.image[0]?.path){
+      try {
+        const imagePath = req?.files?.image[0]?.path;
+        const uploadedImage = await uploadOnCloudinary(imagePath);
+        if (uploadedImage) {
+          req.body.image = uploadedImage?.url || "";
+        } else {
+          console.error("Image upload failed: No URL returned",uploadedImage);
+        }
+      } catch (uploadError) {
+        console.error("Error uploading image to Cloudinary: ", uploadError);
+      }
+      
+    }else{
+      
+      console.log("no image");
+    }
+    
+     
     // Check if LLM mode is enabled
     console.log("is llm", req.LLM);
     console.log(req.body);
@@ -20,11 +43,13 @@ const addProduct = async (req, res) => {
         stock: req?.body?.stock,
         description: req?.body?.description,
         price: req?.body?.price,
+        image: req?.body?.image,
+        ...req.body,
       });
       const result = await newProduct.save();
       return result; // Return result if in LLM mode
     }
-
+      
     // Normal mode
     const newProduct = new Product({
       userID: req?.body?.userId,
@@ -33,6 +58,8 @@ const addProduct = async (req, res) => {
       stock: req?.body?.quantity,
       description: req?.body?.description,
       price: req?.body?.price,
+      image: req?.body?.image,
+      ...req.body,
     });
 
     newProduct
@@ -110,28 +137,83 @@ const deleteSelectedProduct = async (req, res) => {
     if (req.LLM === true) {
       const productName = generateDynamicPattern(req?.params?.name);
 
+      // First find the product to get the image URL
+      const product = await Product.findOne(
+        { $text: { $search: productName } },
+        { score: { $meta: "textScore" } }
+      ).sort({ score: { $meta: "textScore" } });
+
+      console.log("Found product:", product);
+
+      // Delete image from Cloudinary if exists
+      if (product?.image) {
+        try {
+          // Extract public ID from URL like "http://res.cloudinary.com/drsccdxcf/image/upload/v1731699206/rtnglubqx66ez0brxc10.jpg"
+          const urlParts = product.image.split('/');
+          const publicId = urlParts[urlParts.length - 1].split('.')[0]; // Get the last part and remove extension
+          
+          console.log("Image URL:", product.image);
+          console.log("Extracted public ID:", publicId);
+          
+          const result = await cloudinary.uploader.destroy(publicId);
+          console.log("Cloudinary deletion result:", result);
+        } catch (cloudinaryError) {
+          console.error("Error deleting image from Cloudinary:", cloudinaryError);
+          console.error("Error details:", cloudinaryError.message);
+        }
+      } else {
+        console.log("No image found for product");
+      }
+
       const deleteProduct = await Product.deleteOne(
         { $text: { $search: productName } },
         { score: { $meta: "textScore" } }
       ).sort({ score: { $meta: "textScore" } });
-      console.log("req.LLM", req.LLM, "deleteProduct", deleteProduct);
-      // const deletePurchaseProduct = await Purchase.deleteOne({ ProductID: req?.params?.id });
-      // const deleteSaleProduct = await Sales.deleteOne({ ProductID: req?.params?.id });
+
       if (deleteProduct) {
         return { deleteProduct }; // Return result if in LLM mode
       }
-      return { succes: true, data: "cant find the product" };
+      return { success: true, data: "cant find the product" };
     }
 
     // Normal mode
-    const deleteProduct = await Product.deleteOne({ _id: req?.params?.id });
-    const deletePurchaseProduct = await Purchase.deleteOne({
-      ProductID: req?.params?.id,
-    });
-    const deleteSaleProduct = await Sales.deleteOne({
-      ProductID: req?.params?.id,
-    });
-    res.json({ deleteProduct, deletePurchaseProduct, deleteSaleProduct });
+    // First find the product to get the image URL
+    const product = await Product.findOne({ _id: req?.params?.id });
+    console.log("Found product:", product);
+    
+    // Delete image from Cloudinary if exists
+    if (product?.image) {
+      try {
+        // Extract public ID from URL like "http://res.cloudinary.com/drsccdxcf/image/upload/v1731699206/rtnglubqx66ez0brxc10.jpg"
+        const urlParts = product.image.split('/');
+        const publicId = urlParts[urlParts.length - 1].split('.')[0]; // Get the last part and remove extension
+        
+        console.log("Image URL:", product.image);
+        console.log("Extracted public ID:", publicId);
+        
+        const result = await cloudinary.uploader.destroy(publicId);
+        console.log("Cloudinary deletion result:", result);
+      } catch (cloudinaryError) {
+        console.error("Error deleting image from Cloudinary:", cloudinaryError);
+        console.error("Error details:", cloudinaryError.message);
+      }
+    } else {
+      console.log("No image found for product");
+    }
+
+    // Only proceed with deletion if we found the product
+    if (product) {
+      const deleteProduct = await Product.deleteOne({ _id: req?.params?.id });
+      const deletePurchaseProduct = await Purchase.deleteOne({
+        ProductID: req?.params?.id,
+      });
+      const deleteSaleProduct = await Sales.deleteOne({
+        ProductID: req?.params?.id,
+      });
+      res.json({ deleteProduct, deletePurchaseProduct, deleteSaleProduct });
+    } else {
+      res.status(404).json({ success: false, message: "Product not found" });
+    }
   } catch (error) {
     console.error("Error deleting selected product: ", error);
     res.status(500).send("Server error");

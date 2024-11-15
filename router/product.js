@@ -1,9 +1,16 @@
 const express = require("express");
 const app = express();
 const product = require("../controller/product");
-
+const { upload } = require("../middleware/multer.middleware");
 // Add Product
-app.post("/add", product.addProduct);
+app.post("/add", 
+    upload.fields(
+       [ {
+            name: "image",
+            maxCount: 1
+        },
+    ]),
+    product.addProduct);
 
 // Get All Products
 app.get("/get/:userId", product.getAllProducts);

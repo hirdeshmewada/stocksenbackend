@@ -26,7 +26,10 @@ const ProductSchema = new mongoose.Schema(
       min: [0, 'Price must be a positive number'],
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    strict: false,
+  }
 );
 
 ProductSchema.index({ name: 'text', description: 'text' });

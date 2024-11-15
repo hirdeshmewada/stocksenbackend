@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require("express");
 const { main } = require("./models/index");
 const productRoute = require("./router/product");
@@ -76,9 +77,11 @@ app.post("/api/register", (req, res) => {
     .save()
     .then((result) => {
       res.status(200).send(result);
-      alert("Signup Successfull");
     })
-    .catch((err) => console.log("Signup: ", err));
+    .catch((err) => {
+      console.log("Signup: ", err);
+      res.status(400).send({ error: "Registration failed" });
+    });
   console.log("request: ", req.body);
 });
 
