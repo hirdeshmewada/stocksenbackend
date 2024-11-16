@@ -15,16 +15,15 @@ const uploadOnCloudinary = async (file) => {
         const b64 = Buffer.from(file.buffer).toString('base64');
         const dataURI = `data:${file.mimetype};base64,${b64}`;
 
-        // Upload to cloudinary
+        // Upload to cloudinary with specific folder and resource type
         const response = await cloudinary.uploader.upload(dataURI, {
             resource_type: "auto",
-            folder: "your-folder-name" // Optional: specify a folder in cloudinary
+            folder: "inventory-app"
         });
 
-        console.log("File uploaded successfully:", response.url);
         return response;
     } catch (error) {
-        console.log("Error uploading to cloudinary:", error);
+        console.error("Error uploading to cloudinary:", error);
         return null;
     }
 }
