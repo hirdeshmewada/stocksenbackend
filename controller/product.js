@@ -144,9 +144,12 @@ const deleteSelectedProduct = async (req, res) => {
       // Delete image from Cloudinary if exists
       if (product?.image) {
         try {
-          // Extract public ID from URL like "http://res.cloudinary.com/drsccdxcf/image/upload/v1731699206/rtnglubqx66ez0brxc10.jpg"
+          // Extract public ID from URL including folder path
+          // Example: "http://res.cloudinary.com/drsccdxcf/image/upload/v1731771085/inventory-app/ncxto1xoxihyoc1zilmc.jpg"
           const urlParts = product.image.split('/');
-          const publicId = urlParts[urlParts.length - 1].split('.')[0]; // Get the last part and remove extension
+          const fileName = urlParts[urlParts.length - 1]; // Get the filename
+          const folder = urlParts[urlParts.length - 2];   // Get the folder name
+          const publicId = `${folder}/${fileName.split('.')[0]}`; // Combine folder/filename without extension
           
           console.log("Image URL:", product.image);
           console.log("Extracted public ID:", publicId);
@@ -180,9 +183,12 @@ const deleteSelectedProduct = async (req, res) => {
     // Delete image from Cloudinary if exists
     if (product?.image) {
       try {
-        // Extract public ID from URL like "http://res.cloudinary.com/drsccdxcf/image/upload/v1731699206/rtnglubqx66ez0brxc10.jpg"
+        // Extract public ID from URL including folder path
+        // Example: "http://res.cloudinary.com/drsccdxcf/image/upload/v1731771085/inventory-app/ncxto1xoxihyoc1zilmc.jpg"
         const urlParts = product.image.split('/');
-        const publicId = urlParts[urlParts.length - 1].split('.')[0]; // Get the last part and remove extension
+        const fileName = urlParts[urlParts.length - 1]; // Get the filename
+        const folder = urlParts[urlParts.length - 2];   // Get the folder name
+        const publicId = `${folder}/${fileName.split('.')[0]}`; // Combine folder/filename without extension
         
         console.log("Image URL:", product.image);
         console.log("Extracted public ID:", publicId);
