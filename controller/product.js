@@ -8,30 +8,26 @@ const cloudinary = require('cloudinary').v2;
 // Add Post
 const addProduct = async (req, res) => {
   try {
-  
-    
-    if(req?.files?.image[0]?.path){
+    // Check for image in the request
+    if (req?.files?.image && req?.files?.image[0]) {
       try {
-        const imagePath = req?.files?.image[0]?.path;
-        const uploadedImage = await uploadOnCloudinary(imagePath);
-        if (uploadedImage) {
-          req.body.image = uploadedImage?.url || "";
+        const file = req.files.image[0];
+        const uploadedImage = await uploadOnCloudinary(file);
+        
+        if (uploadedImage && uploadedImage.url) {
+          req.body.image = uploadedImage.url;
+          console.log("Image uploaded successfully:", uploadedImage.url);
         } else {
-          console.error("Image upload failed: No URL returned",uploadedImage);
+          console.error("Image upload failed");
         }
       } catch (uploadError) {
-        console.error("Error uploading image to Cloudinary: ", uploadError);
+        console.error("Error uploading image:", uploadError);
       }
-      
-    }else{
-      
-      console.log("no image");
+    } else {
+      console.log("No image provided");
     }
-    
-     
-    // Check if LLM mode is enabled
-    console.log("is llm", req.LLM);
-    console.log(req.body);
+
+    // Rest of your existing product creation logic
     if (req.LLM === true) {
       if (!req?.body?.userId) {
         return "User ID is required"; // Return message if in LLM mode
