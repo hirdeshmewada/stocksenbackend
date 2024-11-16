@@ -1,7 +1,4 @@
 const cloudinary = require('cloudinary').v2;
-const fs = require('fs');
-
-// Add debugging to check if env variables are loaded
 
 // Configuration 
 cloudinary.config({ 
@@ -10,22 +7,24 @@ cloudinary.config({
    api_secret: process.env.CLOUDINARY_API_SECRET
 }); 
 
-const uploadOnCloudinary = async (fileBuffer) => {
+const uploadOnCloudinary = async (file) => {
     try {
-        if (!fileBuffer) return null;
+        if (!file) return null;
+        
+        // Create base64 string from buffer and mimetype
+        const b64 = Buffer.from(file.buffer).toString('base64');
+        const dataURI = `data:${file.mimetype};base64,${b64}`;
 
-        // Convert buffer to base64 string for cloudinary
-        const fileStr = `data:${file.mimetype};base64,${fileBuffer.toString('base64')}`;
-
-        // Upload the buffer directly to cloudinary
-        const response = await cloudinary.uploader.upload(fileStr, {
-            resource_type: "auto"
+        // Upload to cloudinary
+        const response = await cloudinary.uploader.upload(dataURI, {
+            resource_type: "auto",
+            folder: "your-folder-name" // Optional: specify a folder in cloudinary
         });
 
-        console.log("File uploaded to cloudinary successfully");
+        console.log("File uploaded successfully:", response.url);
         return response;
     } catch (error) {
-        console.log("Failed to upload file to cloudinary: ", error);
+        console.log("Error uploading to cloudinary:", error);
         return null;
     }
 }
