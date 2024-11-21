@@ -64,25 +64,46 @@ app.get("/api/login", (req, res) => {
 // ------------------------------------
 
 // Registration API
-app.post("/api/register", (req, res) => {
-  let registerUser = new User({
-    firstName: req?.body?.firstName,
-    lastName: req?.body?.lastName,
-    email: req?.body?.email,
-    password: req?.body?.password,
-    phoneNumber: req?.body?.phoneNumber,
-  });
+// app.post("/api/register", (req, res) => {
+//   let registerUser = new User({
+//     firstName: req?.body?.firstName,
+//     lastName: req?.body?.lastName,
+//     email: req?.body?.email,
+//     password: req?.body?.password,
+//     phoneNumber: req?.body?.phoneNumber,
+//   });
 
-  registerUser
-    .save()
-    .then((result) => {
-      res.status(200).send(result);
-    })
-    .catch((err) => {
-      console.log("Signup: ", err);
-      res.status(400).send({ error: "Registration failed" });
+//   registerUser
+//     .save()
+//     .then((result) => {
+//       res.status(200).send(result);
+//     })
+//     .catch((err) => {
+//       console.log("Signup: ", err);
+//       res.status(400).send({ error: "Registration failed" });
+//     });
+//   console.log("request: ", req.body);
+// });
+
+app.post("/api/register", async (req, res) => {
+  try {
+    let registerUser = new User({
+      firstName: req?.body?.firstName,
+      lastName: req?.body?.lastName,
+      email: req?.body?.email,
+      password: req?.body?.password,
+      phoneNumber: req?.body?.phoneNumber,
     });
-  console.log("request: ", req.body);
+
+    const result = await registerUser.save();
+    console.log("User created:", result);
+    res.status(200).send(result);
+  } catch (err) {
+    console.log("Signup error:", err);
+    res.status(500).send({ message: "Error saving user", error: err });
+  }
+
+  console.log("Request body:", req.body);
 });
 
 app.get("/testget", async (req, res) => {
