@@ -6,7 +6,7 @@ const storeRoute = require("./router/store");
 const purchaseRoute = require("./router/purchase");
 const salesRoute = require("./router/sales");
 const userInteraction = require("./router/user/voice");
-
+import { uploadOnCloudinary } from "/util/cloudinary";
 const voice = require("./router/voice");
 const cors = require("cors");
 const User = require("./models/users");
@@ -86,24 +86,42 @@ app.get("/api/login", (req, res) => {
 // });
 
 app.post("/api/register", async (req, res) => {
-  try {
-    let registerUser = new User({
-      firstName: req?.body?.firstName,
-      lastName: req?.body?.lastName,
-      email: req?.body?.email,
-      password: req?.body?.password,
-      phoneNumber: req?.body?.phoneNumber,
-    });
 
-    const result = await registerUser.save();
-    console.log("User created:", result);
-    res.status(200).send(result);
-  } catch (err) {
-    console.log("Signup error:", err);
-    res.status(500).send({ message: "Error saving user", error: err });
+   if (
+    [firstName, lastName, email, password,phoneNumber].some((field) => field?.trim() === "")
+  ) {
+    throw new ApiError(400, "All fields are required");
   }
 
-  console.log("Request body:", req.body);
+  const existedUser = await User.findOne({
+    $or: [{ phoneNumber }, { email }],
+  });
+
+  if (existedUser) {
+    throw new ApiError(409, "User with email or username already exists");
+  }
+   const avatarLocalPath = req.files?.image[0]?.path;
+  if (avatarLocalPath) {
+     const avatar = await uploadOnCloudinary(avatarLocalPath);
+  
+  }
+   const user = await User.create({
+    firstName: req?.body?.firstName,
+    lastName: req?.body?.lastName,
+    email,
+    password,
+    phoneNumber,
+  });
+    const createdUser = await User.findById(user._id).select(
+    "-password);
+
+     if (!createdUser) {
+    throw new ApiError(500, "Something went wrong while registering the user");
+  }
+
+   return res
+    .status(201)
+    .json(new ApiResponse(200, createdUser, "User registered successfully"));
 });
 
 app.get("/testget", async (req, res) => {
