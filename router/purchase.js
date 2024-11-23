@@ -3,7 +3,15 @@ const app = express();
 const purchase = require("../controller/purchase");
 
 // Add Purchase
-app.post("/add", purchase.addPurchase);
+app.post("/add/:userID", (req, res, next) => {
+  const userID = req.params.userID;
+  if (!userID) {
+    return res.status(400).json({ error: "User ID is required" });
+  }
+  // Attach userID to request body
+  req.body.userID = userID;
+  next();
+}, purchase.addPurchase);
 
 // Get All Purchase Data
 app.get("/get/:userID", purchase.getPurchaseData);

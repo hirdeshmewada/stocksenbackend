@@ -8,46 +8,57 @@ const generateDynamicPattern = require("../util/generateDynamicPattern");
 
 const getMonthlySales = async (req, res) => {
   const currentDate = new Date();
+  currentDate.setHours(23, 59, 59, 999); // Set to end of day
+  
   const startDate = new Date();
   startDate.setDate(currentDate.getDate() - 6); // Start date is 6 days before current date
+  startDate.setHours(0, 0, 0, 0); // Set to start of day
+  
+  const userID = req.params.userID;
 
   if (req?.LLM === true) {
     try {
       const sales = await Sales.find({
+        userID: userID,
         saleDate: {
           $gte: startDate,
-          $lt: currentDate,
+          $lte: currentDate,
         },
       });
 
-      const salesAmount = Array(7).fill(0); // Initialize array for 7 days
+      const salesAmount = Array(7).fill(0);
 
       sales.forEach((sale) => {
-        const dayIndex = Math.floor(
-          (new Date(sale.saleDate) - startDate) / (1000 * 60 * 60 * 24)
-        );
-        sale.soldProducts.forEach((product) => {
-          salesAmount[dayIndex] += product.totalSaleAmount;
-        });
+        // Get the day difference and ensure it's within bounds
+        const saleDate = new Date(sale.saleDate);
+        saleDate.setHours(0, 0, 0, 0); // Normalize to start of day
+        const dayDiff = Math.floor((saleDate - startDate) / (1000 * 60 * 60 * 24));
+        
+        if (dayDiff >= 0 && dayDiff < 7) {
+          sale.soldProducts.forEach((product) => {
+            salesAmount[dayDiff] += product.totalSaleAmount;
+          });
+        }
       });
 
-      return salesAmount; // Return array if in LLM mode
+      return salesAmount;
     } catch (err) {
       console.error(err);
-      return `Error fetching daily sales: ${err.message}`; // Return error message if in LLM mode
+      return `Error fetching daily sales: ${err.message}`;
     }
   }
 
   // Standard API mode
   try {
     const sales = await Sales.find({
+      userID: userID,
       saleDate: {
         $gte: startDate,
-        $lt: currentDate,
+        $lte: currentDate,
       },
     });
 
-    const salesAmount = Array(7).fill(0); // Initialize array for 7 days
+    const salesAmount = Array(7).fill(0);
 
     sales.forEach((sale) => {
       const dayIndex = Math.floor(
@@ -61,9 +72,7 @@ const getMonthlySales = async (req, res) => {
     res.status(200).json(salesAmount);
   } catch (err) {
     console.error(err);
-    res
-      .status(500)
-      .json({ error: `Error fetching daily sales: ${err.message}` });
+    res.status(500).json({ error: `Error fetching daily sales: ${err.message}` });
   }
 };
 

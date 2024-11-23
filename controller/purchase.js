@@ -5,84 +5,8 @@ const generateDynamicPattern = require("../util/generateDynamicPattern");
 
 // Add Purchase Details
 const addPurchase = async (req, res) => {
-  let { userID, purchasedProducts } = req.body;
+  let { userID, purchaseDate, purchasedProducts } = req.body;
 
-  // If LLM mode is enabled, skip the res handling and return the result directly
-  if (req?.LLM === true) {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-    console.log(userID, purchasedProducts, new Date());
-    try {
-      console.log(userID, purchasedProducts, new Date());
-      let tempProducts = [];
-      let bulkOps = [];
-
-      // Update stock for each product in the purchase
-      for (const product of purchasedProducts) {
-        const { productName, quantityPurchased } = product;
-        console.log(
-          "productName, quantityPurchased",
-          productName,
-          quantityPurchased
-        );
-
-        const myProductData = await Product.findOne(
-          { $text: { $search: productName } },
-          { score: { $meta: "textScore" } }
-        )
-          .sort({ score: { $meta: "textScore" } })
-          .session(session);
-
-        console.log("myProductData", myProductData);
-        if (!myProductData) {
-          throw new Error("Product not found");
-        }
-
-        myProductData.stock =
-          parseInt(myProductData.stock) + parseInt(quantityPurchased);
-
-        let temp = {
-          productID: myProductData._id,
-          quantityPurchased: quantityPurchased,
-          totalPurchaseAmount: quantityPurchased * myProductData.price,
-        };
-
-        tempProducts.push(temp);
-
-        bulkOps.push({
-          updateOne: {
-            filter: { _id: myProductData._id },
-            update: { $set: { stock: myProductData.stock } },
-          },
-        });
-      }
-
-      if (bulkOps.length > 0) {
-        await Product.bulkWrite(bulkOps, { session });
-      }
-
-      const addPurchaseDetails = new Purchase({
-        userID,
-        purchasedProducts: tempProducts,
-        purchaseDate: new Date(),
-      });
-
-      const savedPurchase = await addPurchaseDetails.save({ session });
-      await session.commitTransaction();
-      session.endSession();
-      if (savedPurchase) {
-        return savedPurchase;
-      }
-      return { succes: true, data: "can not purchase the product" };
-    } catch (error) {
-      await session.abortTransaction();
-      session.endSession();
-      console.log(error);
-      return { succes: true, data: "can not purchase the product" };
-    }
-  }
-
-  // Normal mode
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -90,36 +14,45 @@ const addPurchase = async (req, res) => {
     const addPurchaseDetails = new Purchase({
       userID,
       purchasedProducts,
-      purchaseDate,
+      purchaseDate: purchaseDate || new Date(),
     });
 
     // Save the purchase transaction
     const savedPurchase = await addPurchaseDetails.save({ session });
 
     // Update stock for each product in the purchase
+    const bulkOps = [];
     for (const product of purchasedProducts) {
       const { productID, quantityPurchased } = product;
 
-      const myProductData = await Product.findOne({ _id: productID }).session(
-        session
-      );
+      const myProductData = await Product.findOne({ _id: productID }).session(session);
       if (!myProductData) {
-        throw new Error("Product not found");
+        throw new Error(`Product not found with ID: ${productID}`);
       }
-      myProductData.stock =
-        parseInt(myProductData.stock) + parseInt(quantityPurchased);
+      
+      const newStock = parseInt(myProductData.stock) + parseInt(quantityPurchased);
+      
+      bulkOps.push({
+        updateOne: {
+          filter: { _id: productID },
+          update: { $set: { stock: newStock } }
+        }
+      });
+    }
 
-      await myProductData.save({ session });
+    if (bulkOps.length > 0) {
+      await Product.bulkWrite(bulkOps, { session });
     }
 
     await session.commitTransaction();
     session.endSession();
 
-    res.status(200).send(savedPurchase);
+    res.status(200).json(savedPurchase);
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
-    res.status(402).send(error.message);
+    console.error('Purchase error:', error);
+    res.status(400).json({ error: error.message });
   }
 };
 
