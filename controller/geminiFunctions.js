@@ -294,7 +294,7 @@ const ErrorResponse = (req, res) => {
   };
 };
 const generativeModel = genAI.getGenerativeModel({
-  model: "gemini-1.0-pro",
+  model: "gemini-1.5-flash",
   tools: {
     functionDeclarations: [
       addPurchaseFunctionDeclaration,
@@ -319,34 +319,44 @@ const generativeModel = genAI.getGenerativeModel({
 
 const handleGeminiRequest = async (req, res) => {
   try {
+    console.log("Received request at /api/gemini/");
+    console.log("Request body:", req.body);
+
     const { query } = req.body;
     if (!query) {
+      console.log("Query is missing in the request body");
       return res.status(400).json({ error: "Query is required" });
     }
+
     const chat = generativeModel.startChat();
     const result = await chat.sendMessage(query);
-    console.log("query:", query);
+    console.log("Query sent to generative model:", query);
+
     let call = "";
     try {
       call = result?.response?.functionCalls()[0];
-    } catch (error) {}
+    } catch (error) {
+      console.log("Error extracting function call from response:", error);
+    }
 
     let Error = "Sorry i can not full fill these types of request";
-    console.log(call?.args, "here is whole call", call);
+    console.log("Function call extracted:", call);
+
     req.params = call?.args;
     req.body = call?.args;
     req.LLM = true;
+
     if (!call) {
-      console.log("no calls");
+      console.log("No function calls found in the response");
       const result2 = await chat.sendMessage(`Always respond with an answer.
-          You are a polite assistant who will professionally explain the error below.
-          '''
-          ${Error}
-          '''
-       `);
+          You are a polite assistant who will professionally explain the error below.
+          '''
+          ${Error}
+          '''
+       `);
       try {
         let message = result2?.response?.text();
-        console.log("message", message);
+        console.log("Response message:", message);
         if (message) {
           res.status(200).json({
             message: result2.response.text(),
@@ -357,14 +367,18 @@ const handleGeminiRequest = async (req, res) => {
           });
         }
       } catch (error) {
+        console.log("Error sending follow-up message:", error);
         res.status(200).json({
           message: "Sorry i can not full fill these types of request",
         });
       }
     }
+
     if (call) {
+      console.log("Processing function call:", call.name);
       const apiResponse = await functions[call.name](req, res);
-      console.log(call?.name);
+      console.log("API response:", apiResponse);
+
       const result2 = await chat.sendMessage(
         [
           {
@@ -379,11 +393,13 @@ const handleGeminiRequest = async (req, res) => {
          If the user asks to add sales, create it and tell the user about the products added with their quantity.
          If the user asks to add purchases, create it and tell basic information about the products added with their quantity.
          never tell user about there userId
-       `
+      `
       );
+      console.log("Final response message:", result2.response.text());
       res.status(200).json({ message: result2.response.text() });
     }
   } catch (error) {
+    console.log("Server error:", error);
     res.status(500).json({ error: "server Error please try again" });
   }
 };
