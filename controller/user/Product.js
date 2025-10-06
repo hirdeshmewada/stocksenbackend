@@ -84,7 +84,7 @@ const functions = {
 };
 
 const generativeModel = genAI.getGenerativeModel({
-  model: "gemini-2.5-flash",
+  model: "gemini-2.5-flash-lite-preview-09-2025",
   tools: {
     functionDeclarations: [addPurchaseFunctionDeclaration],
   },
