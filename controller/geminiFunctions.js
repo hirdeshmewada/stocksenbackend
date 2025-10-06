@@ -294,7 +294,7 @@ const ErrorResponse = (req, res) => {
   };
 };
 const generativeModel = genAI.getGenerativeModel({
-  model: "gemini-1.0-pro",
+  model: "gemini-2.5-flash-preview-09-2025",
   tools: {
     functionDeclarations: [
       addPurchaseFunctionDeclaration,
