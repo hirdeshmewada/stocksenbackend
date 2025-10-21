@@ -133,7 +133,7 @@ const functions = {
 
 // Initialize Gemini model with all available tools
 const generativeModel = genAI.getGenerativeModel({
-  model: "gemini-2.5-flash-preview-09-2025",
+  model: "gemini-2.5-flash",
   tools: {
     functionDeclarations: [
       // Product Operations
